@@ -3,419 +3,551 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>KidoPilot OS | Executive Demo</title>
+    <title>KidoPilot OS | Enterprise Demo</title>
     
-    <!-- React Stack -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- STACK TECHNIQUE ROBUSTE (Versions Production) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-
+    <!-- CONFIGURATION DU DESIGN SYSTEM (CVA Palette) -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Plus Jakarta Sans', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Plus Jakarta Sans', 'sans-serif'] },
                     colors: {
                         brand: {
-                            navy: '#0B2438',
-                            teal: '#0D9488',
-                            tealLight: '#F0FDFA',
+                            navy: '#0B2438', // Bleu Nuit CVA
+                            teal: '#008080', // Teal CVA
+                            tealLight: '#E0F2F1',
                             accent: '#F97316',
-                            surface: '#F8FAFC',
+                            bg: '#F1F5F9',
                             border: '#E2E8F0'
                         }
                     },
-                    animation: {
-                        'slide-up': 'slideUp 0.4s ease-out forwards',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    boxShadow: {
+                        'card': '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
+                        'float': '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)',
                     },
-                    keyframes: {
-                        slideUp: {
-                            '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        }
+                    screens: {
+                        'xs': '475px',
+                        // Default tailwind breakpoints: sm: 640px, md: 768px, lg: 1024px...
                     }
                 }
             }
         }
     </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
-        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
+        body { background-color: #F1F5F9; color: #1e293b; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); }
+        .animate-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Fix mobile height issues */
+        html, body, #root { height: 100%; overflow: hidden; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased overflow-hidden selection:bg-brand-teal selection:text-white">
+<body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
-
-        // --- INLINE ICONS (ZERO DEPENDENCY) ---
-        // SVGs intégrés pour garantir l'affichage à 100% sans script externe
+        // --- 1. ICÔNES SVG NATIVES (Zéro Dépendance) ---
         const Icons = {
-            Menu: <path d="M4 6h16M4 12h16M4 18h16" />,
-            LayoutGrid: <rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" />,
-            CalendarClock: <path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h5" /><path d="M17.5 17.5 16 16.25V14" /><circle cx="16" cy="16" r="6" />,
-            Users: <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />,
-            FileCheck: <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /><path d="m9 15 2 2 4-4" />,
-            Coins: <circle cx="8" cy="8" r="6" /><path d="M18.09 10.37A6 6 0 1 1 10.34 18" /><path d="M7 6h1v4" /><path d="m16.71 13.88.7 .71-2.82 2.82" />,
-            Bell: <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />,
-            Search: <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />,
-            AlertTriangle: <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" />,
-            BrainCircuit: <path d="M12 4.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0-1.32 4.24 3 3 0 0 0 .34 5.58 2.5 2.5 0 0 0 2.96 3.08 2.5 2.5 0 0 0 4.91.05L12 20V4.5Z" /><path d="M16 8V5c0-1.1.9-2 2-2" /><path d="M12 13h4" /><path d="M12 18h6a2 2 0 0 1 2 2v1" /><path d="M12 8h8" />,
-            CheckCircle2: <circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" />,
-            Clock: <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />,
-            TrendingUp: <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" />,
-            DollarSign: <line x1="12" x2="12" y1="2" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />,
-            ArrowRight: <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />,
-            ChevronDown: <path d="m6 9 6 6 6-6" />,
-            Sparkles: <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z" />
+            Menu: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>,
+            X: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>,
+            Dashboard: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>,
+            Planning: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
+            Children: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>,
+            Compliance: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>,
+            Bell: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>,
+            Search: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
+            Alert: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>,
+            Brain: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>,
+            ChevronDown: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>,
+            Plus: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>,
+            Check: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>,
+            TrendingUp: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>,
+            Settings: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>,
+            CheckCircle: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>,
+            CrossCircle: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>,
+            FileText: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         };
 
-        const Icon = ({ name, className = "", size = 20 }) => (
-            <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                width={size} 
-                height={size} 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                className={className}
-            >
-                {Icons[name] || <circle cx="12" cy="12" r="10" />}
-            </svg>
+        // --- 2. DONNÉES MOCK (Business Data) ---
+        const MOCK_DATA = {
+            children: [
+                { id: 1, name: "Léo Martin", age: "18 mois", section: "Moyens", status: "Présent", diet: "Sans Gluten", avatar: "LM" },
+                { id: 2, name: "Emma Petit", age: "24 mois", section: "Grands", status: "Absent (Maladie)", diet: "Standard", avatar: "EP" },
+                { id: 3, name: "Lucas Dubois", age: "12 mois", section: "Bébés", status: "Présent", diet: "Standard", avatar: "LD" },
+                { id: 4, name: "Sofia Benali", age: "20 mois", section: "Moyens", status: "Présent", diet: "Halal", avatar: "SB" },
+                { id: 5, name: "Arthur Rimbaud", age: "30 mois", section: "Grands", status: "Retard", diet: "Végétarien", avatar: "AR" },
+            ],
+            staff: [
+                { id: 1, name: "Marie Laurent", role: "EJE", hours: "08:00 - 16:30", type: "CDI", status: "OK" },
+                { id: 2, name: "Sarah Cohen", role: "Aux. Puér.", hours: "08:30 - 17:00", type: "CDI", status: "OK" },
+                { id: 3, name: "Julie Mendes", role: "CAP AEPE", hours: "09:00 - 18:00", type: "CDD", status: "ABSENT" },
+                { id: 4, name: "Thomas Price", role: "Aux. Puér.", hours: "10:00 - 18:30", type: "CDI", status: "OK" },
+            ],
+            logs: [
+                { time: "08:15", event: "Arrivée de Léo Martin", type: "checkin" },
+                { time: "08:30", event: "Ratio Encadrement retombé à 1:7 (Alerte)", type: "alert" },
+                { time: "09:05", event: "Absence signalée: Julie Mendes", type: "alert" },
+            ],
+            compliance: [
+                { id: 1, category: "Sécurité Bâtiment", item: "Vérification Extincteurs", status: "Validé", date: "15/11/2024" },
+                { id: 2, category: "Sécurité Bâtiment", item: "Système Alarme Incendie", status: "Validé", date: "15/11/2024" },
+                { id: 3, category: "Hygiène (HACCP)", item: "Relevé Température Frigos", status: "Validé", date: "Ce matin" },
+                { id: 4, category: "Hygiène (HACCP)", item: "Traçabilité Repas", status: "Validé", date: "Ce matin" },
+                { id: 5, category: "Ressources Humaines", item: "Dossier Médical (Sarah C.)", status: "Expiré", date: "01/12/2024" },
+                { id: 6, category: "Ressources Humaines", item: "Extrait Casier B2 (Thomas P.)", status: "Validé", date: "10/09/2024" },
+            ]
+        };
+
+        // --- 3. COMPOSANTS UI ---
+
+        // La Sidebar a maintenant un état responsive (Hidden on mobile by default)
+        const Sidebar = ({ activeTab, setTab, isOpen, setIsOpen }) => (
+            <>
+                {/* Mobile Overlay */}
+                {isOpen && (
+                    <div 
+                        className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                        onClick={() => setIsOpen(false)}
+                    />
+                )}
+
+                {/* Sidebar Container */}
+                <aside className={`
+                    fixed lg:static inset-y-0 left-0 z-50 w-64 bg-brand-navy text-white flex flex-col h-full shadow-xl 
+                    transform transition-transform duration-300 ease-in-out
+                    ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+                `}>
+                    <div className="p-6 flex items-center justify-between border-b border-white/10">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-brand-teal rounded-lg flex items-center justify-center font-bold text-xl shadow-lg">K</div>
+                            <div>
+                                <h1 className="font-display font-bold text-lg tracking-wide">KidoPilot</h1>
+                                <p className="text-[10px] text-slate-400 uppercase tracking-wider">Enterprise OS</p>
+                            </div>
+                        </div>
+                        {/* Close button mobile only */}
+                        <button onClick={() => setIsOpen(false)} className="lg:hidden text-slate-400">
+                            {Icons.X}
+                        </button>
+                    </div>
+                    
+                    <div className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
+                        <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Opérations</p>
+                        <NavButton icon={Icons.Dashboard} label="Tableau de bord" active={activeTab === 'dashboard'} onClick={() => { setTab('dashboard'); setIsOpen(false); }} />
+                        <NavButton icon={Icons.Planning} label="Planning & RH" active={activeTab === 'planning'} onClick={() => { setTab('planning'); setIsOpen(false); }} />
+                        <NavButton icon={Icons.Children} label="Dossiers Enfants" active={activeTab === 'children'} onClick={() => { setTab('children'); setIsOpen(false); }} />
+
+                        <div className="h-6"></div>
+                        <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Conformité & Finance</p>
+                        <NavButton icon={Icons.Compliance} label="Audit & Qualité" active={activeTab === 'compliance'} onClick={() => { setTab('compliance'); setIsOpen(false); }} />
+                        <NavButton icon={Icons.Dashboard} label="Facturation & CAF" active={activeTab === 'billing'} onClick={() => { setTab('billing'); setIsOpen(false); }} />
+                        
+                        <div className="h-6"></div>
+                        <p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Système</p>
+                        <NavButton icon={Icons.Settings} label="Paramètres" active={activeTab === 'settings'} onClick={() => { setTab('settings'); setIsOpen(false); }} />
+                    </div>
+
+                    <div className="p-4 border-t border-white/10 bg-black/20">
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-brand-teal flex items-center justify-center text-xs font-bold border-2 border-white/20">CD</div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold truncate">Claire Dupont</p>
+                                <p className="text-xs text-slate-400 truncate">Directrice Régionale</p>
+                            </div>
+                            {Icons.ChevronDown}
+                        </div>
+                    </div>
+                </aside>
+            </>
         );
 
-        // --- COMPONENTS ---
-
-        const Toast = ({ message, type, onClose }) => {
-            useEffect(() => {
-                const timer = setTimeout(onClose, 3000);
-                return () => clearTimeout(timer);
-            }, []);
-
-            const bgClass = type === 'success' ? 'bg-brand-navy text-white' : 'bg-white text-slate-800 border border-slate-200';
-            
-            return (
-                <div className={`fixed bottom-6 right-6 z-[60] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 animate-slide-up ${bgClass}`}>
-                    <Icon name={type === 'success' ? "CheckCircle2" : "Sparkles"} className={type === 'success' ? "text-brand-teal" : "text-brand-accent"} />
-                    <span className="font-medium">{message}</span>
-                </div>
-            );
-        };
-
-        const SidebarItem = ({ icon, label, active, onClick, alert }) => (
+        const NavButton = ({ icon, label, active, onClick }) => (
             <button 
-                onClick={onClick}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${active ? 'bg-brand-teal/10 text-brand-teal font-bold' : 'text-slate-500 hover:bg-slate-100'}`}
+                onClick={onClick} 
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-all duration-200 ${active ? 'bg-brand-teal text-white font-semibold shadow-md' : 'text-slate-300 hover:bg-white/5'}`}
             >
-                <Icon name={icon} className={active ? 'text-brand-teal' : 'text-slate-400 group-hover:text-slate-600'} size={20} />
-                <span className="flex-1 text-left text-sm">{label}</span>
-                {alert && <span className="w-2 h-2 rounded-full bg-brand-accent animate-pulse-slow"></span>}
+                <div className={active ? 'text-white' : 'text-slate-400'}>{icon}</div>
+                {label}
             </button>
         );
 
-        const KPI = ({ title, value, unit, trend, icon, color }) => (
-            <div className="bg-white p-4 lg:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+        const Header = ({ notificationCount, onMenuClick }) => (
+            <header className="h-16 bg-white border-b border-brand-border flex items-center justify-between px-4 lg:px-6 sticky top-0 z-10 shrink-0">
+                <div className="flex items-center gap-4">
+                    <button onClick={onMenuClick} className="lg:hidden text-slate-500 hover:text-brand-navy">
+                        {Icons.Menu}
+                    </button>
+                    <div className="hidden md:flex items-center gap-4 text-slate-500 text-sm">
+                        <span className="font-semibold text-brand-navy">Réseau "Les Petits Pas"</span>
+                        <span className="text-slate-300">/</span>
+                        <span className="font-semibold text-brand-navy">Paris 17 - Batignolles</span>
+                        <span className="px-2 py-0.5 rounded-md bg-green-100 text-green-700 text-xs font-bold border border-green-200">Ouvert</span>
+                    </div>
+                    <div className="md:hidden font-bold text-brand-navy">KidoPilot</div>
+                </div>
+
+                <div className="flex items-center gap-2 lg:gap-4">
+                    <div className="relative hidden sm:block">
+                        <input type="text" placeholder="Rechercher..." className="pl-9 pr-4 py-2 w-48 lg:w-64 rounded-full bg-brand-bg border border-transparent focus:bg-white focus:border-brand-teal focus:ring-0 text-sm transition-all" />
+                        <div className="absolute left-3 top-2.5 text-slate-400">{Icons.Search}</div>
+                    </div>
+                    <div className="h-6 w-px bg-slate-200 mx-2 hidden sm:block"></div>
+                    <button className="relative p-2 text-slate-400 hover:text-brand-navy transition-colors">
+                        {Icons.Bell}
+                        {notificationCount > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white"></span>}
+                    </button>
+                </div>
+            </header>
+        );
+
+        const MetricCard = ({ title, value, unit, trend, trendUp, icon, alert }) => (
+            <div className={`bg-white p-6 rounded-xl shadow-card border ${alert ? 'border-red-300 ring-2 ring-red-50' : 'border-slate-100'} hover:shadow-float transition-all duration-300`}>
                 <div className="flex justify-between items-start mb-4">
-                    <div className={`p-2 rounded-lg ${color}`}>
-                        <Icon name={icon} size={20} />
+                    <div className={`p-2.5 rounded-lg ${alert ? 'bg-red-100 text-red-600' : 'bg-brand-bg text-brand-navy'}`}>
+                        {icon}
                     </div>
-                    {trend && (
-                        <span className="text-[10px] lg:text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full flex items-center">
-                            <Icon name="TrendingUp" size={12} className="mr-1" /> {trend}
-                        </span>
-                    )}
+                    <span className={`text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 ${trendUp ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                        {Icons.TrendingUp} {trend}
+                    </span>
                 </div>
-                <p className="text-slate-500 text-[10px] lg:text-xs font-bold uppercase tracking-wider">{title}</p>
-                <p className="text-xl lg:text-2xl font-display font-bold text-brand-navy mt-1">{value}<span className="text-sm text-slate-400 font-normal ml-1">{unit}</span></p>
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">{title}</p>
+                <div className="flex items-baseline gap-1 mt-1">
+                    <h3 className="text-2xl font-bold text-brand-navy">{value}</h3>
+                    <span className="text-sm text-slate-400 font-medium">{unit}</span>
+                </div>
+                {alert && <p className="text-xs text-red-600 font-bold mt-2 animate-pulse">⚠️ Seuil critique</p>}
             </div>
         );
 
-        // --- VIEWS ---
-
-        const DashboardView = ({ stats, alerts, onFixAlert }) => (
-            <div className="space-y-6 animate-slide-up pb-20 lg:pb-0">
-                {/* Header Context */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-                    <div>
-                        <h2 className="text-2xl font-display font-bold text-brand-navy">Vue d'ensemble</h2>
-                        <p className="text-slate-500 text-sm">Mardi 2 Décembre • Crèche "Les Petits Pas"</p>
-                    </div>
-                    <div className="flex gap-2">
-                        <button className="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 hidden sm:block">Exporter</button>
-                    </div>
-                </div>
-
-                {/* Alerts Section (The Hook) */}
-                {alerts.length > 0 && (
-                    <div className="bg-orange-50/50 border border-orange-100 rounded-2xl p-4 lg:p-6 relative overflow-hidden">
-                        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative z-10">
-                            <div className="flex gap-4">
-                                <div className="bg-white p-3 rounded-xl shadow-sm text-brand-accent">
-                                    <Icon name="AlertTriangle" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-brand-navy text-lg">Attention requise (IA)</h3>
-                                    <p className="text-slate-600 text-sm max-w-md mt-1">
-                                        Sous-effectif critique détecté pour cet après-midi (14h-16h) suite à l'absence déclarée de Julie D.
-                                    </p>
-                                </div>
-                            </div>
-                            <button 
-                                onClick={onFixAlert}
-                                className="w-full md:w-auto bg-brand-accent text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all active:scale-95 flex items-center justify-center gap-2"
-                            >
-                                <Icon name="BrainCircuit" size={18} />
-                                Optimiser le Planning
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* KPIs Grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-                    <KPI title="Taux d'occupation" value={stats.occupancy} unit="%" trend="+2.4%" icon="Users" color="bg-blue-50 text-blue-600" />
-                    <KPI title="Ratio Encadrement" value={`1:${stats.ratio}`} unit="E/P" icon="Users" color={stats.ratio > 6 ? "bg-red-50 text-red-600" : "bg-teal-50 text-brand-teal"} />
-                    <KPI title="Masse Salariale" value={(stats.payroll / 1000).toFixed(1)} unit="k€" trend="-1.2%" icon="DollarSign" color="bg-purple-50 text-purple-600" />
-                    <KPI title="Conformité" value={stats.compliance} unit="/100" icon="FileCheck" color="bg-green-50 text-green-600" />
-                </div>
-
-                {/* Simple Chart Visualization */}
-                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="font-bold text-brand-navy">Évolution des Présences</h3>
-                        <div className="flex gap-2">
-                             <div className="flex items-center gap-1 text-xs text-slate-500"><div className="w-2 h-2 rounded-full bg-brand-teal"></div> Réel</div>
-                             <div className="flex items-center gap-1 text-xs text-slate-500"><div className="w-2 h-2 rounded-full bg-slate-200"></div> Prévu</div>
-                        </div>
-                    </div>
-                    <div className="h-48 flex items-end justify-between gap-2 px-2">
-                         {[65, 75, 94, 88, 70, 85, 90].map((h, i) => (
-                            <div key={i} className="w-full flex flex-col gap-2 group cursor-pointer h-full justify-end">
-                                <div className="w-full bg-slate-100 rounded-t-lg relative overflow-hidden" style={{height: '100%'}}>
-                                    <div style={{height: `${h}%`}} className="absolute bottom-0 w-full bg-brand-teal group-hover:bg-brand-navy transition-all duration-500 rounded-t-lg"></div>
-                                </div>
-                                <span className="text-center text-[10px] text-slate-400 font-medium">J{i+1}</span>
-                            </div>
-                         ))}
-                    </div>
-                </div>
-            </div>
-        );
-
-        const PlanningView = ({ staff, alerts, onFixAlert }) => (
-            <div className="space-y-4 lg:space-y-6 animate-slide-up h-full flex flex-col pb-20 lg:pb-0">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-xl lg:text-2xl font-display font-bold text-brand-navy">Planning Intelligent</h2>
-                    <div className="flex gap-2">
-                         <button className="bg-white border border-slate-200 px-3 py-2 rounded-lg text-sm font-bold text-brand-navy">
-                            Aujourd'hui
-                        </button>
-                    </div>
-                </div>
-
-                <div className="flex-1 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden relative">
-                    {/* Time Header */}
-                    <div className="hidden md:flex h-12 border-b border-slate-100 items-center pl-48 pr-4">
-                        {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map(h => (
-                            <div key={h} className="flex-1 text-xs text-slate-400 font-medium border-l border-slate-100 pl-2">
-                                {h}:00
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Timeline Body */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        {staff.map(person => (
-                            <div key={person.id} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-0 group">
-                                <div className="w-full md:w-48 pr-4 flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-brand-navy text-white flex items-center justify-center text-xs font-bold">
-                                        {person.avatar}
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-brand-navy text-sm">{person.name}</p>
-                                        <p className="text-xs text-slate-500">{person.role}</p>
-                                    </div>
-                                </div>
-                                <div className="w-full md:flex-1 h-10 md:h-12 bg-slate-50 rounded-xl relative border border-slate-100 overflow-hidden">
-                                    {/* The Shift Block */}
-                                    {person.status === 'present' && (
-                                        <div 
-                                            className="absolute top-1 bottom-1 bg-brand-teal/20 border border-brand-teal text-brand-teal text-[10px] md:text-xs font-bold rounded-lg flex items-center justify-center whitespace-nowrap px-2"
-                                            style={{ left: '0%', width: '100%' }} // Simplified for demo
-                                        >
-                                            <Icon name="Clock" size={12} className="mr-1 hidden md:block" />
-                                            {person.shift}
-                                        </div>
-                                    )}
-                                    
-                                    {/* The Problem Block */}
-                                    {person.status === 'absent' && (
-                                        <div 
-                                            className="absolute top-1 bottom-1 bg-red-50 border border-red-200 text-red-500 text-xs font-bold rounded-lg flex items-center justify-center w-full"
-                                        >
-                                            <Icon name="AlertTriangle" size={14} className="mr-2" />
-                                            Absence Non Remplacée
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* AI Action Panel (Bottom) */}
-                {alerts.length > 0 && (
-                    <div className="bg-brand-navy text-white p-4 rounded-xl flex flex-col md:flex-row justify-between items-center shadow-lg gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center animate-pulse-slow">
-                                <Icon name="BrainCircuit" className="text-brand-accent" />
-                            </div>
-                            <div>
-                                <p className="font-bold text-sm">Solution trouvée par l'IA</p>
-                                <p className="text-xs text-slate-300">Remplacement par C. Dupont (Vacataire) disponible.</p>
-                            </div>
-                        </div>
-                        <button 
-                            onClick={onFixAlert}
-                            className="w-full md:w-auto bg-brand-teal hover:bg-teal-600 text-white px-6 py-2 rounded-lg font-bold text-sm transition-colors"
-                        >
-                            Valider (+85€)
-                        </button>
-                    </div>
-                )}
-            </div>
-        );
-
-        // --- MAIN APP SHELL ---
+        // --- 4. LOGIQUE PRINCIPALE ---
 
         const App = () => {
-            const [view, setView] = useState('dashboard');
-            const [alerts, setAlerts] = useState(['understaffed']);
-            const [stats, setStats] = useState({ occupancy: 94, ratio: 6.2, payroll: 32450, compliance: 92 });
-            const [staff, setStaff] = useState([
-                { id: 1, name: 'Marie L.', role: 'EJE', shift: '08:00 - 16:00', status: 'present', avatar: 'M' },
-                { id: 2, name: 'Sarah B.', role: 'AP', shift: '08:30 - 17:00', status: 'present', avatar: 'S' },
-                { id: 3, name: 'Julie D.', role: 'CAP', shift: '09:00 - 18:00', status: 'absent', avatar: 'J' },
-                { id: 4, name: 'Thomas P.', role: 'AP', shift: '10:00 - 18:30', status: 'present', avatar: 'T' },
-            ]);
-            const [showToast, setShowToast] = useState(null);
-            const [isSidebarOpen, setSidebarOpen] = useState(false);
+            const [activeTab, setTab] = React.useState('dashboard');
+            const [isSidebarOpen, setSidebarOpen] = React.useState(false); // Mobile menu state
+            const [isOptimizing, setIsOptimizing] = React.useState(false);
+            const [dataState, setDataState] = React.useState({
+                ratio: 6.8, // Ratio problématique
+                ratioStatus: 'danger',
+                payroll: 32.4,
+                alerts: 2,
+                complianceScore: 92,
+                staff: MOCK_DATA.staff,
+                logs: MOCK_DATA.logs
+            });
 
-            const handleFixAlert = () => {
-                setShowToast({ message: "Analyse des profils...", type: "info" });
-                
+            const handleOptimize = () => {
+                setIsOptimizing(true);
                 setTimeout(() => {
-                    setAlerts([]);
-                    
-                    const newStaff = staff.map(p => 
-                        p.id === 3 ? { ...p, name: 'Clara D. (Interim)', status: 'present', shift: '14:00 - 18:00', avatar: 'C' } : p
-                    );
-                    setStaff(newStaff);
-
-                    setStats(prev => ({
+                    setDataState(prev => ({
                         ...prev,
-                        ratio: 5.8,
-                        payroll: prev.payroll + 85
+                        ratio: 5.4, // Ratio optimal
+                        ratioStatus: 'success',
+                        payroll: 32.55,
+                        alerts: 0,
+                        staff: prev.staff.map(s => s.id === 3 ? {...s, status: "REPLACED", name: "Clara (Interim)", type: "VAC"} : s),
+                        logs: [{ time: "10:42", event: "Optimisation IA: Clara assignée (Vacation)", type: "success" }, ...prev.logs]
                     }));
-
-                    setShowToast({ message: "Planning optimisé !", type: "success" });
-                }, 1000);
+                    setIsOptimizing(false);
+                }, 1500);
             };
 
             return (
-                <div className="flex h-screen w-full bg-slate-50">
-                    {/* Sidebar Mobile Overlay */}
-                    {isSidebarOpen && (
-                        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)}></div>
-                    )}
-
-                    {/* Sidebar */}
-                    <aside className={`fixed lg:static inset-y-0 left-0 w-64 bg-white border-r border-slate-200 z-50 transform transition-transform duration-300 lg:transform-none ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}>
-                        <div className="p-6 flex items-center gap-3">
-                            <div className="w-8 h-8 bg-brand-navy rounded-lg flex items-center justify-center text-white font-display font-bold text-lg shadow-md">K</div>
-                            <span className="font-display font-bold text-xl tracking-tight text-brand-navy">KidoPilot</span>
-                        </div>
-
-                        <div className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-                            <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Pilotage</p>
-                            <SidebarItem icon="LayoutGrid" label="Tableau de bord" active={view === 'dashboard'} onClick={() => { setView('dashboard'); setSidebarOpen(false); }} alert={alerts.length > 0} />
-                            <SidebarItem icon="CalendarClock" label="Planning" active={view === 'planning'} onClick={() => { setView('planning'); setSidebarOpen(false); }} />
-                            <SidebarItem icon="Users" label="Enfants & Staff" />
-                            
-                            <div className="h-6"></div>
-                            <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Conformité</p>
-                            <SidebarItem icon="FileCheck" label="Audit PMI" />
-                            <SidebarItem icon="Coins" label="CAF & PSU" />
-                        </div>
-
-                        <div className="p-4 border-t border-slate-100">
-                            <div className="flex items-center gap-3 px-4 py-2">
-                                <div className="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs font-bold">CD</div>
-                                <div className="flex-1">
-                                    <p className="text-sm font-bold text-brand-navy">Claire D.</p>
-                                    <p className="text-xs text-slate-500">Directrice</p>
+                <div className="flex h-screen overflow-hidden bg-slate-50">
+                    
+                    <Sidebar activeTab={activeTab} setTab={setTab} isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} />
+                    
+                    <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+                        <Header notificationCount={dataState.alerts} onMenuClick={() => setSidebarOpen(true)} />
+                        
+                        <main className="flex-1 overflow-y-auto p-4 lg:p-8">
+                            <div className="max-w-7xl mx-auto space-y-6 lg:space-y-8 animate-in pb-20 lg:pb-0">
+                                
+                                {/* HEADER SECTION */}
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                                    <div>
+                                        <h2 className="text-2xl font-display font-bold text-brand-navy">
+                                            {activeTab === 'dashboard' ? 'Tableau de bord' : 
+                                             activeTab === 'planning' ? 'Planning & RH' : 
+                                             activeTab === 'compliance' ? 'Audit & Qualité' :
+                                             'Dossiers Enfants'}
+                                        </h2>
+                                        <p className="text-slate-500 text-sm mt-1">Dernière synchro: Aujourd'hui à 10:41</p>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <button className="px-4 py-2 bg-white border border-slate-200 text-slate-600 font-medium rounded-lg text-sm hover:bg-slate-50 shadow-sm hidden sm:block">
+                                            Exporter (PDF)
+                                        </button>
+                                        <button className="px-4 py-2 bg-brand-navy text-white font-medium rounded-lg text-sm hover:bg-slate-800 shadow-lg flex items-center gap-2">
+                                            {Icons.Plus} <span className="hidden sm:inline">Nouvelle Entrée</span><span className="sm:hidden">Ajout</span>
+                                        </button>
+                                    </div>
                                 </div>
+
+                                {/* DASHBOARD CONTENT */}
+                                {activeTab === 'dashboard' && (
+                                    <>
+                                        {/* ALERT BANNER */}
+                                        {dataState.alerts > 0 && (
+                                            <div className="bg-white border-l-4 border-brand-accent rounded-r-xl p-4 lg:p-6 shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-pulse">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="p-3 bg-orange-50 text-brand-accent rounded-full shrink-0">
+                                                        {Icons.Alert}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-bold text-brand-navy text-lg">Alerte IA : Sous-effectif (14h-18h)</h3>
+                                                        <p className="text-slate-600 text-sm">Risque non-conformité (Ratio 1:9 chez Moyens).</p>
+                                                    </div>
+                                                </div>
+                                                <button 
+                                                    onClick={handleOptimize}
+                                                    disabled={isOptimizing}
+                                                    className="w-full sm:w-auto px-6 py-3 bg-brand-navy text-white font-bold rounded-lg shadow-lg hover:bg-slate-800 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                                                >
+                                                    {isOptimizing ? 'Calcul en cours...' : <>{Icons.Brain} Optimiser</>}
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {/* KPI GRID */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                                            <MetricCard title="Taux d'Occupation" value="94.2" unit="%" trend="+1.5%" trendUp={true} icon={Icons.Children} />
+                                            <MetricCard 
+                                                title="Ratio Encadrement" 
+                                                value={`1:${dataState.ratio}`} 
+                                                unit="" 
+                                                trend={dataState.ratioStatus === 'danger' ? "-0.8 (Critique)" : "+0.4 (Optimal)"} 
+                                                trendUp={dataState.ratioStatus === 'success'} 
+                                                icon={Icons.Dashboard} 
+                                                alert={dataState.ratioStatus === 'danger'}
+                                            />
+                                            <MetricCard title="Masse Salariale" value={dataState.payroll} unit="k€" trend="-0.5%" trendUp={true} icon={<span className="font-bold text-xl">€</span>} />
+                                            <MetricCard title="Score Conformité" value={dataState.complianceScore} unit="/100" trend="Stable" trendUp={true} icon={Icons.Compliance} />
+                                        </div>
+
+                                        {/* CHARTS */}
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                            <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-card border border-brand-border overflow-hidden">
+                                                <div className="flex justify-between items-center mb-6">
+                                                    <h3 className="font-bold text-brand-navy">Fréquentation Hebdomadaire</h3>
+                                                    <div className="flex gap-2">
+                                                        <span className="flex items-center text-xs text-slate-500 gap-1"><span className="w-2 h-2 rounded-full bg-brand-navy"></span> Réel</span>
+                                                        <span className="flex items-center text-xs text-slate-500 gap-1"><span className="w-2 h-2 rounded-full bg-brand-teal"></span> Prévu</span>
+                                                    </div>
+                                                </div>
+                                                <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 px-2">
+                                                    {[65, 80, 95, 90, 75, 50, 0].map((h, i) => (
+                                                        <div key={i} className="w-full bg-slate-100 rounded-t-lg relative group h-full">
+                                                            <div style={{height: `${h}%`}} className="absolute bottom-0 w-full bg-brand-navy rounded-t-lg opacity-80 group-hover:opacity-100 transition-all"></div>
+                                                            <div style={{height: `${h + 5}%`}} className="absolute bottom-0 w-full border-t-2 border-dashed border-brand-teal opacity-50"></div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className="flex justify-between mt-2 text-xs font-bold text-slate-400 uppercase">
+                                                    <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="bg-white p-6 rounded-xl shadow-card border border-brand-border flex flex-col">
+                                                <h3 className="font-bold text-brand-navy mb-4">Fil d'Activité</h3>
+                                                <div className="flex-1 overflow-y-auto space-y-4 pr-2 max-h-[300px]">
+                                                    {dataState.logs.map((log, i) => (
+                                                        <div key={i} className="flex gap-3 text-sm">
+                                                            <span className="text-slate-400 font-mono text-xs pt-1 min-w-[40px]">{log.time}</span>
+                                                            <div>
+                                                                <p className={`font-medium ${log.type === 'alert' ? 'text-red-600' : log.type === 'success' ? 'text-brand-teal' : 'text-slate-700'}`}>
+                                                                    {log.event}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {/* PLANNING VIEW (SWIMLANES) */}
+                                {activeTab === 'planning' && (
+                                    <div className="bg-white rounded-xl shadow-card border border-brand-border overflow-hidden">
+                                        <div className="p-4 border-b border-brand-border bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                            <div className="flex gap-2">
+                                                <button className="px-3 py-1 bg-white border border-slate-300 rounded text-sm font-medium shadow-sm">Aujourd'hui</button>
+                                                <button className="px-3 py-1 text-slate-500 hover:text-brand-navy text-sm">Semaine</button>
+                                            </div>
+                                            <div className="flex gap-4 text-xs font-medium text-slate-500">
+                                                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-brand-teal/20 border border-brand-teal rounded"></span> Présent</span>
+                                                <span className="flex items-center gap-1"><span className="w-3 h-3 bg-red-100 border border-red-500 rounded"></span> Absent</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="overflow-x-auto">
+                                            <div className="min-w-[800px]">
+                                                {/* GANTT HEADER */}
+                                                <div className="flex border-b border-brand-border">
+                                                    <div className="w-64 p-3 font-bold text-xs text-slate-500 uppercase tracking-wider border-r border-brand-border bg-slate-50 sticky left-0 z-10">Personnel</div>
+                                                    <div className="flex-1 flex">
+                                                        {[8,9,10,11,12,13,14,15,16,17,18].map(h => (
+                                                            <div key={h} className="flex-1 p-3 text-center text-xs font-bold text-slate-400 border-r border-slate-100 bg-slate-50">{h}h</div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                {/* GANTT ROWS */}
+                                                {dataState.staff.map((staff) => (
+                                                    <div key={staff.id} className="flex border-b border-slate-100 group hover:bg-slate-50 transition-colors">
+                                                        <div className="w-64 p-4 border-r border-brand-border flex items-center gap-3 bg-white sticky left-0 z-10">
+                                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0 ${staff.status === 'ABSENT' ? 'bg-red-500' : staff.type === 'VAC' ? 'bg-brand-accent' : 'bg-brand-navy'}`}>
+                                                                {staff.name.charAt(0)}
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <p className="font-bold text-sm text-brand-navy truncate">{staff.name}</p>
+                                                                <p className="text-xs text-slate-500">{staff.role} • {staff.type}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex-1 relative h-16 bg-white/50">
+                                                            <div 
+                                                                className={`absolute top-3 bottom-3 rounded-md border text-xs font-bold flex items-center justify-center shadow-sm whitespace-nowrap overflow-hidden px-2
+                                                                    ${staff.status === 'ABSENT' ? 'bg-red-50 border-red-200 text-red-600 border-dashed' : 
+                                                                      staff.type === 'VAC' ? 'bg-orange-50 border-brand-accent text-brand-accent animate-in' : 
+                                                                      'bg-brand-teal/10 border-brand-teal text-brand-teal'}`}
+                                                                style={{
+                                                                    left: staff.status === 'ABSENT' ? '10%' : staff.type === 'VAC' ? '55%' : '5%', 
+                                                                    width: staff.status === 'ABSENT' ? '80%' : staff.type === 'VAC' ? '35%' : '75%'
+                                                                }}
+                                                            >
+                                                                {staff.status === 'ABSENT' ? 'ABSENCE NON REMPLACÉE' : staff.hours}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* COMPLIANCE VIEW (New Feature) */}
+                                {activeTab === 'compliance' && (
+                                    <div className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            <div className="bg-white p-6 rounded-xl border border-brand-border shadow-sm flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-slate-500 text-xs font-bold uppercase">Score Global</p>
+                                                    <p className="text-3xl font-bold text-brand-navy mt-1">92<span className="text-sm text-slate-400">/100</span></p>
+                                                </div>
+                                                <div className="h-16 w-16 rounded-full border-4 border-brand-teal flex items-center justify-center bg-teal-50 text-brand-teal font-bold text-xl">A</div>
+                                            </div>
+                                            <div className="bg-white p-6 rounded-xl border border-brand-border shadow-sm">
+                                                <p className="text-slate-500 text-xs font-bold uppercase">Documents à jour</p>
+                                                <div className="mt-2 w-full bg-slate-100 rounded-full h-2.5">
+                                                    <div className="bg-brand-navy h-2.5 rounded-full" style={{ width: '95%' }}></div>
+                                                </div>
+                                                <p className="text-right text-xs font-bold text-slate-500 mt-1">142/145</p>
+                                            </div>
+                                            <div className="bg-white p-6 rounded-xl border border-brand-border shadow-sm flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-slate-500 text-xs font-bold uppercase">Prochaine Visite</p>
+                                                    <p className="text-xl font-bold text-brand-navy mt-1">J-12</p>
+                                                </div>
+                                                <div className="p-3 bg-brand-bg rounded-lg text-slate-500">{Icons.Planning}</div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white rounded-xl shadow-card border border-brand-border overflow-hidden">
+                                            <div className="px-6 py-4 border-b border-brand-border bg-slate-50">
+                                                <h3 className="font-bold text-brand-navy">Points de Contrôle (PMI & Sécurité)</h3>
+                                            </div>
+                                            <table className="w-full text-sm text-left">
+                                                <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-brand-border hidden md:table-header-group">
+                                                    <tr>
+                                                        <th className="px-6 py-3">Catégorie</th>
+                                                        <th className="px-6 py-3">Point de contrôle</th>
+                                                        <th className="px-6 py-3">Date</th>
+                                                        <th className="px-6 py-3">Statut</th>
+                                                        <th className="px-6 py-3 text-right">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100">
+                                                    {MOCK_DATA.compliance.map((item) => (
+                                                        <tr key={item.id} className="hover:bg-slate-50 flex flex-col md:table-row">
+                                                            <td className="px-6 py-3 md:py-4 font-medium text-slate-500 md:w-1/4">{item.category}</td>
+                                                            <td className="px-6 py-1 md:py-4 font-bold text-brand-navy">{item.item}</td>
+                                                            <td className="px-6 py-1 md:py-4 text-slate-500">{item.date}</td>
+                                                            <td className="px-6 py-1 md:py-4">
+                                                                <span className={`px-2 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1 ${item.status === 'Validé' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                                                                    {item.status === 'Validé' ? Icons.CheckCircle : Icons.CrossCircle}
+                                                                    {item.status}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-3 md:py-4 text-left md:text-right">
+                                                                <button className="text-brand-teal font-bold hover:underline text-xs uppercase tracking-wide">
+                                                                    {item.status === 'Validé' ? 'Voir Preuve' : 'Mettre à jour'}
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* CHILDREN VIEW */}
+                                {activeTab === 'children' && (
+                                    <div className="bg-white rounded-xl shadow-card border border-brand-border overflow-hidden">
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-sm text-left">
+                                                <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-brand-border">
+                                                    <tr>
+                                                        <th className="px-6 py-4 font-bold">Enfant</th>
+                                                        <th className="px-6 py-4 font-bold">Section</th>
+                                                        <th className="px-6 py-4 font-bold">Régime</th>
+                                                        <th className="px-6 py-4 font-bold">Statut</th>
+                                                        <th className="px-6 py-4 font-bold text-right">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100">
+                                                    {MOCK_DATA.children.map((child) => (
+                                                        <tr key={child.id} className="hover:bg-slate-50">
+                                                            <td className="px-6 py-4 font-bold text-brand-navy flex items-center gap-3">
+                                                                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs text-slate-600 shrink-0">{child.avatar}</div>
+                                                                <div>{child.name}<div className="text-xs font-normal text-slate-500">{child.age}</div></div>
+                                                            </td>
+                                                            <td className="px-6 py-4">{child.section}</td>
+                                                            <td className="px-6 py-4">
+                                                                <span className={`px-2 py-1 rounded text-xs font-bold ${child.diet === 'Standard' ? 'bg-slate-100 text-slate-500' : 'bg-purple-50 text-purple-600'}`}>
+                                                                    {child.diet}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <span className={`px-2 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1 ${child.status.includes('Absent') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+                                                                    <span className={`w-1.5 h-1.5 rounded-full ${child.status.includes('Absent') ? 'bg-red-600' : 'bg-green-600'}`}></span>
+                                                                    {child.status}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-right">
+                                                                <button className="text-brand-teal font-bold hover:underline">Dossier</button>
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+
                             </div>
-                        </div>
-                    </aside>
-
-                    {/* Main Content */}
-                    <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
-                        {/* Mobile Header */}
-                        <div className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 z-30">
-                            <button onClick={() => setSidebarOpen(true)} className="p-2 text-slate-600">
-                                <Icon name="Menu" />
-                            </button>
-                            <span className="font-bold text-brand-navy">KidoPilot</span>
-                            <div className="w-8"></div>
-                        </div>
-
-                        {/* Desktop Header */}
-                        <header className="hidden lg:flex h-16 glass-panel items-center justify-between px-8 z-30">
-                            <div className="flex items-center gap-4 text-sm text-slate-500">
-                                <span className="font-bold text-brand-navy">Paris 17 - Batignolles</span>
-                                <Icon name="ChevronDown" size={14} />
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <button className="p-2 relative text-slate-400 hover:text-brand-navy transition">
-                                    <Icon name="Bell" size={20} />
-                                    {alerts.length > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-accent rounded-full border border-white"></span>}
-                                </button>
-                            </div>
-                        </header>
-
-                        {/* Content Area */}
-                        <div className="flex-1 overflow-auto p-4 lg:p-8 relative">
-                            {view === 'dashboard' && <DashboardView stats={stats} alerts={alerts} onFixAlert={() => setView('planning')} />}
-                            {view === 'planning' && <PlanningView staff={staff} alerts={alerts} onFixAlert={handleFixAlert} />}
-                        </div>
-                    </main>
-
-                    {/* Toast */}
-                    {showToast && (
-                        <Toast 
-                            message={showToast.message} 
-                            type={showToast.type} 
-                            onClose={() => setShowToast(null)} 
-                        />
-                    )}
+                        </main>
+                    </div>
                 </div>
             );
         };
