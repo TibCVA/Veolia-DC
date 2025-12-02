@@ -1,1779 +1,428 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CVA - Veolia Data Center Gensets Strategic Analysis</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --cva-primary: #0A2E4D;
-            --cva-secondary: #1E5A8E;
-            --cva-accent: #FFD700;
-            --cva-light: #E8F4FA;
-            --cva-text: #333333;
-            --cva-gray: #666666;
-            --white: #FFFFFF;
-            --success: #2E8B57;
-            --warning: #FF6347;
-            --diesel: #4A4A4A;
-            --battery: #4CAF50;
-            --gas: #FF9800;
-            --hydrogen: #2196F3;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            color: var(--cva-text);
-            line-height: 1.6;
-            overflow-x: hidden;
-            background-color: #FAFAFA;
-        }
-
-        /* Navigation */
-        .nav-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .nav-content {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 0 40px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 80px;
-        }
-
-        .logo {
-            font-size: 36px;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -1px;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 25px;
-            list-style: none;
-        }
-
-        .nav-item {
-            position: relative;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--cva-text);
-            font-weight: 500;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            padding: 8px 12px;
-            position: relative;
-            display: inline-block;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 12px;
-            right: 12px;
-            height: 2px;
-            background: var(--cva-secondary);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .nav-link:hover::after,
-        .nav-link.active::after {
-            transform: scaleX(1);
-        }
-
-        .nav-link:hover {
-            color: var(--cva-secondary);
-        }
-
-        .nav-link.active {
-            color: var(--cva-primary);
-            font-weight: 600;
-        }
-
-        /* Section Base Styles */
-        .section {
-            min-height: 100vh;
-            padding: 120px 0 60px;
-            position: relative;
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
-
-        .section-header {
-            margin-bottom: 50px;
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        .section-number {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%);
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 50px;
-            font-weight: 700;
-            font-size: 22px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 15px rgba(10, 46, 77, 0.2);
-        }
-
-        .section-title {
-            font-size: 42px;
-            font-weight: 800;
-            color: var(--cva-primary);
-            line-height: 1.2;
-            margin-bottom: 16px;
-            letter-spacing: -1px;
-        }
-
-        .section-subtitle {
-            font-size: 20px;
-            color: var(--cva-gray);
-            font-weight: 400;
-            line-height: 1.5;
-        }
-
-        /* Tables */
-        .data-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.08);
-            margin: 30px 0;
-            animation: fadeIn 0.8s ease-out;
-            font-size: 14px;
-        }
-
-        .data-table th {
-            background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%);
-            color: white;
-            padding: 16px 20px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-
-        .data-table th:first-child {
-            padding-left: 24px;
-        }
-
-        .data-table td {
-            padding: 14px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 13px;
-            vertical-align: top;
-        }
-
-        .data-table td:first-child {
-            padding-left: 24px;
-            font-weight: 600;
-        }
-
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .data-table tr:hover td {
-            background-color: rgba(232, 244, 250, 0.5);
-        }
-
-        /* TRL Badge */
-        .trl-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            color: white;
-        }
-
-        .trl-9 {
-            background-color: var(--success);
-        }
-
-        .trl-8 {
-            background-color: #66BB6A;
-        }
-
-        .trl-7 {
-            background-color: var(--warning);
-        }
-
-        /* Technology Cards */
-        .tech-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin: 30px 0;
-        }
-
-        .tech-card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tech-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--cva-primary) 0%, var(--cva-secondary) 100%);
-        }
-
-        .tech-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
-        }
-
-        .tech-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--cva-primary);
-            margin-bottom: 12px;
-        }
-
-        .tech-specs {
-            display: grid;
-            gap: 8px;
-            font-size: 13px;
-        }
-
-        .spec-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .spec-label {
-            color: #666;
-        }
-
-        .spec-value {
-            font-weight: 600;
-            color: var(--cva-primary);
-        }
-
-        /* Country Analysis Chart */
-        .country-chart {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.08);
-            margin: 30px 0;
-        }
-
-        .bar-horizontal {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .country-label {
-            width: 120px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .bar-container {
-            flex: 1;
-            height: 40px;
-            background: #f0f0f0;
-            border-radius: 6px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .bar-segment {
-            position: absolute;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .bar-diesel {
-            background: var(--diesel);
-        }
-
-        .bar-battery {
-            background: var(--battery);
-        }
-
-        .bar-gas {
-            background: var(--gas);
-        }
-
-        /* Cost Comparison Visual */
-        .cost-matrix {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-
-        .cost-cell {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .cost-cell:hover {
-            transform: translateY(-3px);
-            border-color: var(--cva-secondary);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .cost-tech {
-            font-weight: 700;
-            color: var(--cva-primary);
-            margin-bottom: 12px;
-            font-size: 16px;
-        }
-
-        .cost-metrics {
-            display: grid;
-            gap: 8px;
-            font-size: 13px;
-        }
-
-        .cost-metric {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        /* Tier Matrix */
-        .tier-matrix {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.08);
-            margin: 30px 0;
-        }
-
-        .tier-row {
-            display: grid;
-            grid-template-columns: 100px 200px 150px 120px 150px 250px 120px;
-            gap: 20px;
-            padding: 15px 0;
-            border-bottom: 1px solid #e0e0e0;
-            align-items: center;
-        }
-
-        .tier-row:first-child {
-            font-weight: 600;
-            background: #f8f9fa;
-            margin: -15px -30px 15px;
-            padding: 15px 30px;
-            border-bottom: 2px solid var(--cva-primary);
-        }
-
-        .tier-row:last-child {
-            border-bottom: none;
-        }
-
-        .tier-badge {
-            background: var(--cva-primary);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 12px;
-            text-align: center;
-        }
-
-        /* Concise Commentary Box */
-        .commentary-box {
-            background: linear-gradient(135deg, var(--cva-light) 0%, #f0f7fc 100%);
-            border-left: 4px solid var(--cva-secondary);
-            padding: 20px 25px;
-            margin: 30px 0;
-            border-radius: 8px;
-            font-size: 15px;
-            color: var(--cva-primary);
-            line-height: 1.6;
-        }
-
-        /* Footnotes */
-        .footnote {
-            font-size: 12px;
-            color: #666;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f8f8;
-            border-radius: 6px;
-            line-height: 1.6;
-        }
-
-        /* Definitions Box */
-        .definitions-box {
-            background: #f0f7fc;
-            border: 1px solid #d0e5f2;
-            border-radius: 8px;
-            padding: 25px;
-            margin: 30px 0;
-        }
-
-        .definitions-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--cva-primary);
-            margin-bottom: 16px;
-        }
-
-        .definition-item {
-            margin-bottom: 12px;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .definition-term {
-            font-weight: 600;
-            color: var(--cva-primary);
-            display: inline-block;
-            min-width: 150px;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .tech-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .cost-matrix {
-                grid-template-columns: 1fr;
-            }
-
-            .tier-row {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .section-title {
-                font-size: 32px;
-            }
-
-            .nav-menu {
-                display: none;
-            }
-
-            .container {
-                padding: 0 20px;
-            }
-
-            .data-table {
-                font-size: 12px;
-                overflow-x: auto;
-                display: block;
-            }
-
-            .data-table th,
-            .data-table td {
-                padding: 10px;
-            }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%);
-            border-radius: 6px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--cva-primary);
-        }
-
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-content {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 0 40px;
-            z-index: 2;
-            position: relative;
-        }
-
-        .hero-title {
-            font-size: 64px;
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        .hero-subtitle {
-            font-size: 24px;
-            color: var(--cva-gray);
-            margin-bottom: 32px;
-            font-weight: 400;
-            animation: fadeInUp 1s ease-out 0.2s both;
-        }
-
-        .hero-metrics {
-            display: flex;
-            gap: 40px;
-            margin-bottom: 40px;
-            animation: fadeInUp 1s ease-out 0.4s both;
-        }
-
-        .hero-metric {
-            text-align: center;
-        }
-
-        .hero-metric-value {
-            font-size: 48px;
-            font-weight: 800;
-            color: var(--cva-primary);
-            line-height: 1;
-        }
-
-        .hero-metric-label {
-            font-size: 14px;
-            color: var(--cva-gray);
-            margin-top: 8px;
-        }
-
-        .hero-cta {
-            display: inline-block;
-            padding: 16px 40px;
-            background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 17px;
-            transition: all 0.3s ease;
-            animation: fadeInUp 1s ease-out 0.6s both;
-            box-shadow: 0 10px 30px rgba(10, 46, 77, 0.3);
-        }
-
-        .hero-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(10, 46, 77, 0.4);
-        }
-
-        /* Highlight classes */
-        .highlight-diesel {
-            background-color: rgba(74, 74, 74, 0.1);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: 600;
-        }
-
-        .highlight-battery {
-            background-color: rgba(76, 175, 80, 0.1);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: 600;
-        }
-
-        .highlight-cost {
-            background-color: #FFE599;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-weight: 600;
-        }
-
-        /* Range indicator */
-        .range-value {
-            display: inline-block;
-            padding: 4px 8px;
-            background: #f0f0f0;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 13px;
-        }
-
-        /* Status indicators */
-        .status-low {
-            color: var(--success);
-            font-weight: 600;
-        }
-
-        .status-medium {
-            color: #FF9800;
-            font-weight: 600;
-        }
-
-        .status-high {
-            color: var(--warning);
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="nav-container" id="navbar">
-        <div class="nav-content">
-            <div class="logo">CVA</div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="#hero" class="nav-link active">Executive Summary</a></li>
-                <li class="nav-item"><a href="#slide9" class="nav-link">9. Technology Landscape</a></li>
-                <li class="nav-item"><a href="#slide10" class="nav-link">10. Stand-by Fleet</a></li>
-                <li class="nav-item"><a href="#slide11" class="nav-link">11. Cost & Carbon</a></li>
-                <li class="nav-item"><a href="#slide12" class="nav-link">12. Resilience Requirements</a></li>
-                <li class="nav-item"><a href="#slide13" class="nav-link">13. Service Stack</a></li>
-                <li class="nav-item"><a href="#slide14" class="nav-link">14. Service Spend</a></li>
-                <li class="nav-item"><a href="#slide15" class="nav-link">15. Policy Shifts</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero" id="hero">
-        <div class="hero-content">
-            <h1 class="hero-title">Data Center Gensets<br>Strategic Analysis</h1>
-            <p class="hero-subtitle">Comprehensive assessment of stand-by power technologies and market opportunities</p>
-            <div class="hero-metrics">
-                <div class="hero-metric">
-                    <div class="hero-metric-value">93%</div>
-                    <div class="hero-metric-label">Diesel Market Share</div>
-                </div>
-                <div class="hero-metric">
-                    <div class="hero-metric-value">9</div>
-                    <div class="hero-metric-label">Countries Analyzed</div>
-                </div>
-                <div class="hero-metric">
-                    <div class="hero-metric-value">€520/kW</div>
-                    <div class="hero-metric-label">Diesel CAPEX</div>
-                </div>
-            </div>
-            <a href="#slide9" class="hero-cta">Explore Full Analysis →</a>
-        </div>
-    </section>
-
-    <!-- Slide 9: Technology Landscape -->
-    <section class="section" id="slide9">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-number">9</span>
-                <h2 class="section-title">Technology Landscape for Stand-by Power</h2>
-                <p class="section-subtitle">Diesel dominates; Li-ion hybrids are commercially bankable today; green-hydrogen fuel-cells still at pilot-cost.</p>
-            </div>
-
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Technology family</th>
-                        <th>EU-TRL*</th>
-                        <th>Proven unit size (MW)</th>
-                        <th>Typical autonomy on-site</th>
-                        <th>Start-up (cold)</th>
-                        <th>Confirmed DC pilots**</th>
-                        <th>Main OEMs</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Diesel genset</strong></td>
-                        <td><span class="trl-badge trl-9">9</span></td>
-                        <td>0.3 – 3.0</td>
-                        <td>48 – 96 h (dual tanks)</td>
-                        <td>&lt; 10 s</td>
-                        <td>100 % of Tier III/IV sites in Uptime Global Survey 2024 p.12</td>
-                        <td>Caterpillar, Cummins, MTU</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Natural-gas genset</strong></td>
-                        <td><span class="trl-badge trl-9">9</span></td>
-                        <td>0.5 – 3.0</td>
-                        <td>≥ 24 h (pipeline/LNG)</td>
-                        <td>10 – 30 s</td>
-                        <td>Digital Realty FRA-4, Frankfurt – permit HReg-2018-0315 + DR PR 15-Mar-18</td>
-                        <td>Caterpillar, Kohler-SDMO, MTU</td>
-                    </tr>
-                    <tr>
-                        <td><strong>"HVO-ready" diesel</strong></td>
-                        <td><span class="trl-badge trl-8">8</span></td>
-                        <td>= diesel</td>
-                        <td>= diesel</td>
-                        <td>&lt; 10 s</td>
-                        <td>AWS Eskilstuna (SE) – Cummins PR 04-Oct-22 + AWS blog 06-Oct-22</td>
-                        <td>Cummins, Volvo Penta, Aggreko</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Rack Li-ion UPS (NMC)</strong></td>
-                        <td><span class="trl-badge trl-9">9</span></td>
-                        <td>0.3 – 3.0</td>
-                        <td>5 – 15 min</td>
-                        <td>&lt; 50 ms</td>
-                        <td>Google St-Ghislain (BE) – Google blog 23-Jun-20 + Vertiv CS 2021</td>
-                        <td>Vertiv, Eaton, Huawei</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Container BESS (LFP 2 h)</strong></td>
-                        <td><span class="trl-badge trl-9">9</span></td>
-                        <td>1 – 10</td>
-                        <td>1 – 4 h</td>
-                        <td>&lt; 50 ms</td>
-                        <td>Microsoft Dublin – MS PR & Fluence PR 14-Dec-23</td>
-                        <td>Tesla, Fluence, Sungrow</td>
-                    </tr>
-                    <tr>
-                        <td><strong>PEM H₂ fuel-cell</strong></td>
-                        <td><span class="trl-badge trl-7">7–8</span></td>
-                        <td>0.25 – 3.0</td>
-                        <td>12 – 48 h</td>
-                        <td>5 – 15 min</td>
-                        <td>Microsoft Latham (WA, US) – MS PR + Plug Power PR 28-Feb-22</td>
-                        <td>Plug Power, Ballard, Bloom</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Flywheel UPS</strong></td>
-                        <td><span class="trl-badge trl-9">9</span></td>
-                        <td>0.5 – 2.0</td>
-                        <td>15 – 90 s</td>
-                        <td>&lt; 5 ms</td>
-                        <td>IBM Poughkeepsie – IBM PR 05-Mar-18 + Active Power WP 2018</td>
-                        <td>Active Power, Piller, Vycon</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Dual-site active-active†</strong></td>
-                        <td><span class="trl-badge trl-9">9 (design)</span></td>
-                        <td>logic pattern</td>
-                        <td>n/a</td>
-                        <td>instant</td>
-                        <td>Meta Prineville & Forest City – SRE conf. 2015 slides</td>
-                        <td>—</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="footnote">
-                * EU-TRL = European Technology Readiness Level (1 = concept, 9 = wide industrial deployment).<br>
-                ** Pilot listed only when two independent primary sources are available.<br>
-                † Logical architecture, no on-site generation.
-            </div>
-
-            <div class="commentary-box">
-                <strong>Concise commentary:</strong> Diesel is the only TRL-9 solution that meets &lt; 10 s start and ≥ 48 h autonomy; Li-ion/LFP batteries are fully proven for ≤ 4 h support and already monetise grid services; PEM H₂ fuel-cells deliver zero-carbon long-duration back-up but cost &gt; €3 000 kW⁻¹.
-            </div>
-        </div>
-    </section>
-
-    <!-- Slide 10: 2024 Stand-by Fleet -->
-    <section class="section" id="slide10" style="background-color: #fafafa;">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-number">10</span>
-                <h2 class="section-title">2024 Stand-by Fleet – Nine-Country Fact-Base</h2>
-                <p class="section-subtitle">Diesel > 90 % of installed MW; batteries are material only in US and UK.</p>
-            </div>
-
-            <div class="footnote" style="margin-bottom: 20px;">
-                <strong>Fuel-rule (Uptime Tier Guidelines §4.2.2)</strong> – every stand-by unit must store ≥ 12 h fuel on site.<br>
-                <strong>QC-gate</strong> – quality check applied: ∑ stand-by MW ≤ 1.5 × IT MW (prevents double-counting).
-            </div>
-
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Country</th>
-                        <th>IT load MW (2024)</th>
-                        <th>Diesel MW (lo–hi)</th>
-                        <th>Li-ion / BESS MW</th>
-                        <th>Gas MW</th>
-                        <th>Other MW</th>
-                        <th>Diesel : IT</th>
-                        <th>Primary evidence</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>United States</strong></td>
-                        <td>25 000</td>
-                        <td><span class="range-value">15 000 – 25 000</span></td>
-                        <td><span class="range-value">1 000 – 2 500</span></td>
-                        <td><span class="range-value">300 – 500</span></td>
-                        <td>12</td>
-                        <td><span class="highlight-diesel">0.60–1.00</span></td>
-                        <td>EPA ECHO (scrape May-25); Uptime 2024</td>
-                    </tr>
-                    <tr>
-                        <td><strong>United Kingdom</strong></td>
-                        <td>2 190</td>
-                        <td><span class="range-value">1 000 – 1 500</span></td>
-                        <td><span class="range-value">60 – 120</span></td>
-                        <td>&lt; 5</td>
-                        <td>&lt; 5</td>
-                        <td><span class="highlight-diesel">0.46–0.68</span></td>
-                        <td>UK EA EPR permit list (Jan-25); DS3 battery registry</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Germany</strong></td>
-                        <td>1 220</td>
-                        <td><span class="range-value">650 – 1 300</span></td>
-                        <td><span class="range-value">45 – 90</span></td>
-                        <td>&lt; 5</td>
-                        <td>&lt; 5</td>
-                        <td><span class="highlight-diesel">0.53–1.07</span></td>
-                        <td>BImSchV §31 register (Apr-25)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>France</strong></td>
-                        <td>1 200</td>
-                        <td><span class="range-value">800 – 1 800</span></td>
-                        <td><span class="range-value">50 – 100</span></td>
-                        <td>&lt; 5</td>
-                        <td>&lt; 5</td>
-                        <td><span class="highlight-diesel">0.67–1.50</span></td>
-                        <td>ICPE 2910 database (Mar-25)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Benelux</strong></td>
-                        <td>1 450</td>
-                        <td><span class="range-value">500 – 800</span></td>
-                        <td><span class="range-value">30 – 60</span></td>
-                        <td>&lt; 5</td>
-                        <td>&lt; 5</td>
-                        <td><span class="highlight-diesel">0.34–0.55</span></td>
-                        <td>NL RVO emission licence export (partial)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Spain</strong></td>
-                        <td>920</td>
-                        <td><span class="range-value">300 – 750</span></td>
-                        <td><span class="range-value">20 – 45</span></td>
-                        <td>&lt; 5</td>
-                        <td>—</td>
-                        <td><span class="highlight-diesel">0.33–0.82</span></td>
-                        <td>Regional EPER files (ES-CAT, ES-MAD)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Singapore</strong></td>
-                        <td>877</td>
-                        <td><span class="range-value">700 – 1 000</span></td>
-                        <td><span class="range-value">40 – 80</span></td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td><span class="highlight-diesel">0.80–1.14</span></td>
-                        <td>BCA "Resilience Class" returns 2024</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Hong Kong</strong></td>
-                        <td>1 312</td>
-                        <td><span class="range-value">600 – 1 200</span></td>
-                        <td><span class="range-value">35 – 70</span></td>
-                        <td>—</td>
-                        <td>—</td>
-                        <td><span class="highlight-diesel">0.46–0.91</span></td>
-                        <td>EPD permit list 2024</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Australia</strong></td>
-                        <td>1 920</td>
-                        <td><span class="range-value">1 200 – 2 900</span></td>
-                        <td><span class="range-value">70 – 150</span></td>
-                        <td>&lt; 5</td>
-                        <td>—</td>
-                        <td><span class="highlight-diesel">0.62–1.51</span></td>
-                        <td>NSW EPA + VIC EPA datasets</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="country-chart">
-                <h3 style="color: var(--cva-primary); margin-bottom: 20px;">Stand-by Power Mix by Country (% of total MW)</h3>
-                <div class="bar-horizontal">
-                    <div class="country-label">United States</div>
-                    <div class="bar-container">
-                        <div class="bar-segment bar-diesel" style="width: 87%; left: 0;">87%</div>
-                        <div class="bar-segment bar-battery" style="width: 10%; left: 87%;">10%</div>
-                        <div class="bar-segment bar-gas" style="width: 3%; left: 97%;">3%</div>
-                    </div>
-                </div>
-                <div class="bar-horizontal">
-                    <div class="country-label">United Kingdom</div>
-                    <div class="bar-container">
-                        <div class="bar-segment bar-diesel" style="width: 92%; left: 0;">92%</div>
-                        <div class="bar-segment bar-battery" style="width: 8%; left: 92%;">8%</div>
-                    </div>
-                </div>
-                <div class="bar-horizontal">
-                    <div class="country-label">Germany</div>
-                    <div class="bar-container">
-                        <div class="bar-segment bar-diesel" style="width: 94%; left: 0;">94%</div>
-                        <div class="bar-segment bar-battery" style="width: 6%; left: 94%;">6%</div>
-                    </div>
-                </div>
-                <div class="bar-horizontal">
-                    <div class="country-label">France</div>
-                    <div class="bar-container">
-                        <div class="bar-segment bar-diesel" style="width: 95%; left: 0;">95%</div>
-                        <div class="bar-segment bar-battery" style="width: 5%; left: 95%;">5%</div>
-                    </div>
-                </div>
-                <div class="bar-horizontal">
-                    <div class="country-label">Benelux</div>
-                    <div class="bar-container">
-                        <div class="bar-segment bar-diesel" style="width: 93%; left: 0;">93%</div>
-                        <div class="bar-segment bar-battery" style="width: 7%; left: 93%;">7%</div>
-                    </div>
-                </div>
-                <div class="bar-horizontal">
-                    <div class="country-label">Spain</div>
-                    <div class="bar-container">
-                        <div class="bar-segment bar-diesel" style="width: 94%; left: 0;">94%</div>
-                        <div class="bar-segment bar-battery" style="width: 6%; left: 94%;">6%</div>
-                    </div>
-                </div>
-                <div class="bar-horizontal">
-                    <div class="country-label">Singapore</div>
-                    <div class="bar-container">
-                        <div class="bar-segment bar-diesel" style="width: 93%; left: 0;">93%</div>
-                        <div class="bar-segment bar-battery" style="width: 7%; left: 93%;">7%</div>
-                    </div>
-                </div>
-                <div class="bar-horizontal">
-                    <div class="country-label">Hong Kong</div>
-                    <div class="bar-container">
-                        <div class="bar-segment bar-diesel" style="width: 94%; left: 0;">94%</div>
-                        <div class="bar-segment bar-battery" style="width: 6%; left: 94%;">6%</div>
-                    </div>
-                </div>
-                <div class="bar-horizontal">
-                    <div class="country-label">Australia</div>
-                    <div class="bar-container">
-                        <div class="bar-segment bar-diesel" style="width: 95%; left: 0;">95%</div>
-                        <div class="bar-segment bar-battery" style="width: 5%; left: 95%;">5%</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="commentary-box">
-                <strong>Concise commentary:</strong> Diesel provides 93 % of stand-by MW across the scope; battery deployments are concentrated in markets with remunerated frequency-response (PJM, DS3). All reported totals respect the QC-gate.
-            </div>
-        </div>
-    </section>
-
-    <!-- Slide 11: Cost & Carbon Comparison -->
-    <section class="section" id="slide11">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-number">11</span>
-                <h2 class="section-title">Cost & Carbon Comparison (Real-2024 €)</h2>
-                <p class="section-subtitle">Diesel is cheapest to buy; batteries are cheapest to run when ancillary-service income is allowed.</p>
-            </div>
-
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Technology</th>
-                        <th>CAPEX €/kW<br>(turn-key)</th>
-                        <th>OPEX €/kWh<br>(700 h yr⁻¹)</th>
-                        <th>Lifecycle CO₂<br>g kWh⁻¹ (ISO 14044)</th>
-                        <th>Footprint<br>m² MW⁻¹</th>
-                        <th>Maint.<br>h MW⁻¹ yr⁻¹</th>
-                        <th>Proven grid-service<br>income €/kW-yr</th>
-                        <th>Sources (two min.)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Diesel genset</strong></td>
-                        <td><span class="highlight-cost">520</span></td>
-                        <td>0.185</td>
-                        <td>666</td>
-                        <td>23</td>
-                        <td>40</td>
-                        <td>0</td>
-                        <td>US-DOE Cost Report Q4-24 p17; Caterpillar C175 datasheet 2024</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Natural-gas genset</strong></td>
-                        <td>650</td>
-                        <td><span class="highlight-cost">0.123</span></td>
-                        <td>530</td>
-                        <td>28</td>
-                        <td>38</td>
-                        <td>0</td>
-                        <td>Caterpillar CG132 brochure 2024; Wärtsilä Lifecycle Cost Note 2023</td>
-                    </tr>
-                    <tr>
-                        <td><strong>HVO-diesel</strong></td>
-                        <td>570</td>
-                        <td>0.262</td>
-                        <td><span class="highlight-cost">235</span></td>
-                        <td>23</td>
-                        <td>40</td>
-                        <td>0</td>
-                        <td>Neste HVO LCA 2023 p22; Cummins HVO retrofit bulletin 2024</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Li-ion rack UPS (NMC)</strong></td>
-                        <td>3 800</td>
-                        <td><span class="highlight-cost">0.021</span></td>
-                        <td>58</td>
-                        <td>38</td>
-                        <td>4</td>
-                        <td><span class="highlight-battery">58</span></td>
-                        <td>Vertiv Liebert GXT-RT-10k spec 2024; UK DS3 settlement avg 2023</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Container BESS (LFP 2 h)</strong></td>
-                        <td>1 450</td>
-                        <td>0.034</td>
-                        <td><span class="highlight-cost">41</span></td>
-                        <td>90</td>
-                        <td>6</td>
-                        <td><span class="highlight-battery">58 (UK) / 25 (US)</span></td>
-                        <td>Tesla Megapack EPC quote 2024; PJM RegD pricing Apr-24</td>
-                    </tr>
-                    <tr>
-                        <td><strong>PEM H₂ fuel-cell</strong></td>
-                        <td>3 200</td>
-                        <td>0.402</td>
-                        <td><span class="highlight-cost">0</span></td>
-                        <td>60</td>
-                        <td>15</td>
-                        <td>23</td>
-                        <td>Plug Power GenSure spec 2024; PJM capacity auction 2024</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Flywheel UPS</strong></td>
-                        <td>1 200</td>
-                        <td><span class="highlight-cost">0.015</span></td>
-                        <td><span class="highlight-cost">0</span></td>
-                        <td>12</td>
-                        <td>6</td>
-                        <td>0</td>
-                        <td>Active Power CleanSource flyer 2024; IBM Ops Note 2018</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="cost-matrix">
-                <div class="cost-cell">
-                    <div class="cost-tech">Diesel genset</div>
-                    <div class="cost-metrics">
-                        <div class="cost-metric">
-                            <span>Total 10-yr cost:</span>
-                            <span style="color: var(--success); font-weight: bold;">€1,815/kW</span>
-                        </div>
-                        <div class="cost-metric">
-                            <span>Break-even vs BESS:</span>
-                            <span>Never without grid income</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="cost-cell">
-                    <div class="cost-tech">Li-ion rack UPS</div>
-                    <div class="cost-metrics">
-                        <div class="cost-metric">
-                            <span>Total 10-yr cost:</span>
-                            <span style="color: var(--success); font-weight: bold;">€3,353/kW</span>
-                        </div>
-                        <div class="cost-metric">
-                            <span>With grid income:</span>
-                            <span style="color: var(--battery); font-weight: bold;">€2,773/kW</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="cost-cell">
-                    <div class="cost-tech">Container BESS</div>
-                    <div class="cost-metrics">
-                        <div class="cost-metric">
-                            <span>Total 10-yr cost:</span>
-                            <span style="color: var(--success); font-weight: bold;">€1,688/kW</span>
-                        </div>
-                        <div class="cost-metric">
-                            <span>With grid income:</span>
-                            <span style="color: var(--battery); font-weight: bold;">€1,108/kW</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="cost-cell">
-                    <div class="cost-tech">PEM H₂ fuel-cell</div>
-                    <div class="cost-metrics">
-                        <div class="cost-metric">
-                            <span>Total 10-yr cost:</span>
-                            <span style="color: var(--warning); font-weight: bold;">€6,014/kW</span>
-                        </div>
-                        <div class="cost-metric">
-                            <span>Green premium:</span>
-                            <span>+231% vs diesel</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="commentary-box">
-                <strong>Concise commentary:</strong> Diesel minimises upfront cost but has the highest fuel+carbon burden; Li-ion and LFP batteries offset higher CAPEX with grid-service income, delivering the lowest lifetime cost in PJM and DS3 markets; PEM fuel-cells achieve zero operational emissions but remain six times diesel CAPEX.
-            </div>
-        </div>
-    </section>
-
-    <!-- Slide 12: Resilience Requirements -->
-    <section class="section" id="slide12" style="background-color: #fafafa;">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-number">12</span>
-                <h2 class="section-title">Resilience Requirements by Tier, Workload & Dominant Geography</h2>
-                <p class="section-subtitle">Diesel remains mandatory for Tier IV; Tier III hyperscale is shifting towards battery-diesel hybrids.</p>
-            </div>
-
-            <div class="tier-matrix">
-                <div class="tier-row">
-                    <div>Uptime Tier</div>
-                    <div>Workload archetype</div>
-                    <div>Main geography share*</div>
-                    <div>Max outage allowed</div>
-                    <div>Autonomy spec</div>
-                    <div>Technologies meeting requirement (2024)</div>
-                    <div>Probability of tech shift by 2030</div>
-                </div>
-                <div class="tier-row">
-                    <div><span class="tier-badge">Tier IV</span></div>
-                    <div>Real-time trading</div>
-                    <div>UK + FR banks ≈ 80 %</div>
-                    <div>0 s</div>
-                    <div>≥ 72 h (2N+1)</div>
-                    <div>Diesel + flywheel</div>
-                    <div><span class="status-low">Low</span></div>
-                </div>
-                <div class="tier-row">
-                    <div><span class="tier-badge">Tier III</span></div>
-                    <div>Consumer SaaS</div>
-                    <div>US 54 %, AU 12 %, SG 45 %</div>
-                    <div>5 s</div>
-                    <div>≥ 24 h (N+1)</div>
-                    <div>Diesel (92 %) → Battery-diesel (8 %)</div>
-                    <div><span class="status-high">High</span></div>
-                </div>
-                <div class="tier-row">
-                    <div><span class="tier-badge">Tier II</span></div>
-                    <div>Enterprise SaaS</div>
-                    <div>ES 55 %, Benelux 40 %</div>
-                    <div>30 min</div>
-                    <div>6 – 12 h</div>
-                    <div>Diesel N (95 %), Li-ion UPS (5 %)</div>
-                    <div><span class="status-medium">Medium</span></div>
-                </div>
-                <div class="tier-row">
-                    <div><span class="tier-badge">AI / ML pods</span></div>
-                    <div>GPU training</div>
-                    <div>US & AU clusters ≈ 0.8 GW</div>
-                    <div>2 h checkpoint</div>
-                    <div>0.25 – 2 h</div>
-                    <div>Battery 1 h + diesel fallback</div>
-                    <div><span class="status-high">High</span></div>
-                </div>
-                <div class="tier-row">
-                    <div><span class="tier-badge">Tier I</span></div>
-                    <div>Edge / Dev-test</div>
-                    <div>Distributed</div>
-                    <div>24 h</div>
-                    <div>5 – 15 min UPS</div>
-                    <div>Li-ion UPS</div>
-                    <div><span class="status-low">Low</span></div>
-                </div>
-            </div>
-
-            <div class="footnote">
-                * Share of global MW for the cited workload/Tier segment, compiled from Synergy Research 2024 and operator disclosures.
-            </div>
-
-            <div class="commentary-box">
-                <strong>Concise commentary:</strong> Diesel continues to satisfy all high-SLA segments; battery hybrids are gaining share in Tier III hyperscale where grid revenue is available; Tier II sites may adopt Li-ion racks to comply with tightening air-quality limits; no material change is expected for Tier IV before the next major refresh (≈ 2035).
-            </div>
-
-            <div class="definitions-box">
-                <h3 class="definitions-title">Definitions</h3>
-                <div class="definition-item">
-                    <span class="definition-term">Fuel-rule</span> Stand-by equipment must store enough energy for ≥ 12 h full-load autonomy (Uptime Tier Standards §4.2.2).
-                </div>
-                <div class="definition-item">
-                    <span class="definition-term">QC-gate</span> Internal validation rule: stand-by MW may not exceed 1.5 × installed IT MW to avoid double-counting.
-                </div>
-                <div class="definition-item">
-                    <span class="definition-term">EU-TRL</span> European Technology Readiness Level scale (1 = basic idea, 9 = mass deployment).
-                </div>
-                <div class="definition-item">
-                    <span class="definition-term">CAPEX basis</span> Full EPC cost including fuel system, exhaust treatment, fire protection; real-2024 €.
-                </div>
-                <div class="definition-item">
-                    <span class="definition-term">OPEX basis</span> Fuel + consumables at 700 h stand-by runtime per year; excludes staff.
-                </div>
-                <div class="definition-item">
-                    <span class="definition-term">Lifecycle CO₂</span> Cradle-to-grave emissions (ISO 14044) per delivered kWh back-up.
-                </div>
-                <div class="definition-item">
-                    <span class="definition-term">Footprint</span> Surface required for a reference 1 MW block, including fuel or battery storage.
-                </div>
-                <div class="definition-item">
-                    <span class="definition-term">Grid-service income</span> Documented average earnings from frequency-response or reserve markets where technology qualifies (UK DS3 2023, PJM RegD 2024).
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Slide 13: End-to-end Service Stack -->
-    <section class="section" id="slide13">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-number">13</span>
-                <h2 class="section-title">End-to-end Service Stack for Data-Centre Backup Power</h2>
-                <p class="section-subtitle">Strategic message – operators pay for a four-layer service chain that extends far beyond Tier-rating compliance; each layer shows distinct spend drivers and contract norms.</p>
-            </div>
-
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Service layer</th>
-                        <th>Typical scope (illustrative)</th>
-                        <th>Primary spend driver</th>
-                        <th>Reference cost evidence</th>
-                        <th>Contract archetype & term</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>1 Engineering & installation</strong></td>
-                        <td>Design, permitting, civil works, switchgear integration, fire protection</td>
-                        <td>One-off CAPEX add-on of €140-180 /kW (diesel) – higher (-30 %) for BESS due to PCS & HVAC</td>
-                        <td>Install cost from Generac TCO calculator €140 /kW [4] ; BESS installs ~€200 /kW (NREL 2023 BESS balance-of-plant)</td>
-                        <td>EPC lump-sum, 12- to 24-month schedule</td>
-                    </tr>
-                    <tr>
-                        <td><strong>2 Preventive MRO</strong></td>
-                        <td>Quarterly inspection, oil & filter change, bearing replacement (flywheel), cell diagnostics (BESS)</td>
-                        <td>€5 /kW-yr diesel; €7-10 /kW-yr diesel + flywheel; €3 /kW-yr BESS</td>
-                        <td>Diesel MRO: OEM guideline $500 + $1/kW yr ≈ €5 /kW-yr [4]; BESS O&M $300 / yr for 100 kW, scales to €3 /kW-yr [15]</td>
-                        <td>3- to 5-yr PPM contracts – eg. Penobscot US Army IDIQ €13.7 m/5 yr [2]</td>
-                    </tr>
-                    <tr>
-                        <td><strong>3 Fuel / energy logistics</strong></td>
-                        <td>Diesel or HVO supply, bulk storage testing; battery recharge energy</td>
-                        <td>Diesel €0.30 /kWh (Penn State 2023) [5]; HVO +25 % (Digital Realty trial) [12]; Grid recharge €0.15 /kWh off-peak [5]</td>
-                        <td></td>
-                        <td>Frame-contract with fuel suppliers or utility PPA; often 1-yr rolling</td>
-                    </tr>
-                    <tr>
-                        <td><strong>4 Grid-service monetisation</strong></td>
-                        <td>Capacity market availability, FR / aFRR bids, demand-response dispatch</td>
-                        <td>UK CM 2024/25 £35.8 /kW-yr [13]; DE aFRR ave €13 /MW-h (2024) [9]; AUS Very-Fast FCAS A$11-14 /MWh [10]</td>
-                        <td></td>
-                        <td>Aggregator or direct market access; 1- to 15-yr (capacity auctions)</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="service-stack-visual">
-                <h3 style="color: var(--cva-primary); margin: 30px 0 20px;">Service Stack Value Breakdown</h3>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 30px 0;">
-                    <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); border-top: 4px solid var(--cva-primary);">
-                        <div style="font-size: 24px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">Layer 1</div>
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Engineering & Installation</div>
-                        <div style="font-size: 28px; font-weight: 800; color: var(--cva-secondary);">€140-180/kW</div>
-                        <div style="font-size: 13px; color: #666; margin-top: 8px;">One-time CAPEX</div>
-                    </div>
-                    <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); border-top: 4px solid var(--cva-secondary);">
-                        <div style="font-size: 24px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">Layer 2</div>
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Preventive MRO</div>
-                        <div style="font-size: 28px; font-weight: 800; color: var(--cva-secondary);">€5-10/kW-yr</div>
-                        <div style="font-size: 13px; color: #666; margin-top: 8px;">Annual OPEX</div>
-                    </div>
-                    <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); border-top: 4px solid var(--diesel);">
-                        <div style="font-size: 24px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">Layer 3</div>
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Fuel/Energy Logistics</div>
-                        <div style="font-size: 28px; font-weight: 800; color: var(--cva-secondary);">€0.30/kWh</div>
-                        <div style="font-size: 13px; color: #666; margin-top: 8px;">Variable cost</div>
-                    </div>
-                    <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); border-top: 4px solid var(--battery);">
-                        <div style="font-size: 24px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">Layer 4</div>
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Grid Monetisation</div>
-                        <div style="font-size: 28px; font-weight: 800; color: var(--battery);">€35-60/kW-yr</div>
-                        <div style="font-size: 13px; color: #666; margin-top: 8px;">Revenue stream</div>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background: #f8f9fa; border-radius: 12px; padding: 25px; margin: 30px 0;">
-                <h3 style="color: var(--cva-primary); margin-bottom: 16px;">Comments</h3>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="margin-bottom: 12px; padding-left: 24px; position: relative;">
-                        <span style="position: absolute; left: 0; color: var(--cva-secondary); font-weight: bold;">•</span>
-                        Most DC owners now bundle layers 2–3 under integrated FM deals (e.g. Mitie–MPS £170 m, 4 yrs [1]).
-                    </li>
-                    <li style="margin-bottom: 12px; padding-left: 24px; position: relative;">
-                        <span style="position: absolute; left: 0; color: var(--cva-secondary); font-weight: bold;">•</span>
-                        Grid-service revenue (layer 4) is small today (≈5 % of OPEX) but rising fastest; batteries qualify for all new sub-second markets, diesel only for capacity / tertiary reserve.
-                    </li>
-                    <li style="margin-bottom: 12px; padding-left: 24px; position: relative;">
-                        <span style="position: absolute; left: 0; color: var(--cva-secondary); font-weight: bold;">•</span>
-                        Emission compliance (EU MCPD 190 mg NOx) adds SCR service line-items from 2025 onward [10].
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <!-- Slide 14: Annual Backup-Power Service Spend -->
-    <section class="section" id="slide14" style="background-color: #fafafa;">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-number">14</span>
-                <h2 class="section-title">Annual Backup-Power Service Spend, Nine Focus Markets (2024)</h2>
-                <p class="section-subtitle">Strategic message – ~€1.1 bn annual service pool; three countries (US, UK, DE) account for >70 % and remain diesel-heavy.</p>
-            </div>
-
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Country</th>
-                        <th>IT load 2024 (MW)</th>
-                        <th>Stand-by MW (1.5 × IT)</th>
-                        <th>Avg service €/kW-yr<br>(diesel-weighted)</th>
-                        <th>Spend band (€ m / yr)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>USA</strong></td>
-                        <td>15 000 (est.) [92]</td>
-                        <td>22 500</td>
-                        <td>50</td>
-                        <td style="background-color: rgba(30, 90, 142, 0.1); font-weight: bold;">1 125</td>
-                    </tr>
-                    <tr>
-                        <td><strong>UK</strong></td>
-                        <td>1 100 [92]</td>
-                        <td>1 650</td>
-                        <td>55</td>
-                        <td style="background-color: rgba(30, 90, 142, 0.08);">91</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Germany</strong></td>
-                        <td>1 000 [92]</td>
-                        <td>1 500</td>
-                        <td>45-55</td>
-                        <td style="background-color: rgba(30, 90, 142, 0.08);">68-83</td>
-                    </tr>
-                    <tr>
-                        <td><strong>France</strong></td>
-                        <td>1 200 [92]</td>
-                        <td>1 800</td>
-                        <td>45-50</td>
-                        <td style="background-color: rgba(30, 90, 142, 0.06);">81-90</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Benelux</strong></td>
-                        <td>1 450 [92]</td>
-                        <td>2 175</td>
-                        <td>45-50</td>
-                        <td style="background-color: rgba(30, 90, 142, 0.07);">98-109</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Spain</strong></td>
-                        <td>920 [92]</td>
-                        <td>1 380</td>
-                        <td>45-50</td>
-                        <td style="background-color: rgba(30, 90, 142, 0.05);">62-69</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Singapore</strong></td>
-                        <td>877 [92]</td>
-                        <td>1 315</td>
-                        <td>60 (hi labour & carbon tax)</td>
-                        <td style="background-color: rgba(30, 90, 142, 0.06);">79</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Hong Kong</strong></td>
-                        <td>1 312 [92]</td>
-                        <td>1 968</td>
-                        <td>55</td>
-                        <td style="background-color: rgba(30, 90, 142, 0.07);">108</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Australia</strong></td>
-                        <td>1 920 [92]</td>
-                        <td>2 880</td>
-                        <td>50</td>
-                        <td style="background-color: rgba(30, 90, 142, 0.08);">144</td>
-                    </tr>
-                    <tr style="background-color: #f0f0f0; font-weight: bold;">
-                        <td><strong>Total</strong></td>
-                        <td>–</td>
-                        <td>–</td>
-                        <td>–</td>
-                        <td style="font-size: 16px; color: var(--cva-primary);">≈1 100-1 200</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="country-chart">
-                <h3 style="color: var(--cva-primary); margin-bottom: 20px;">Service Spend Distribution by Country (€m/yr)</h3>
-                <div style="display: flex; align-items: flex-end; justify-content: space-around; height: 300px; padding: 20px; gap: 15px;">
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-                        <div style="font-size: 14px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">€1,125m</div>
-                        <div style="width: 100%; background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%); height: 280px; border-radius: 8px 8px 0 0;"></div>
-                        <div style="margin-top: 8px; font-size: 12px; font-weight: 600;">USA</div>
-                    </div>
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-                        <div style="font-size: 14px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">€144m</div>
-                        <div style="width: 100%; background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%); height: 36px; border-radius: 8px 8px 0 0;"></div>
-                        <div style="margin-top: 8px; font-size: 12px; font-weight: 600;">AU</div>
-                    </div>
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-                        <div style="font-size: 14px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">€108m</div>
-                        <div style="width: 100%; background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%); height: 27px; border-radius: 8px 8px 0 0;"></div>
-                        <div style="margin-top: 8px; font-size: 12px; font-weight: 600;">HK</div>
-                    </div>
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-                        <div style="font-size: 14px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">€104m</div>
-                        <div style="width: 100%; background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%); height: 26px; border-radius: 8px 8px 0 0;"></div>
-                        <div style="margin-top: 8px; font-size: 12px; font-weight: 600;">BENELUX</div>
-                    </div>
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-                        <div style="font-size: 14px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">€91m</div>
-                        <div style="width: 100%; background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%); height: 23px; border-radius: 8px 8px 0 0;"></div>
-                        <div style="margin-top: 8px; font-size: 12px; font-weight: 600;">UK</div>
-                    </div>
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-                        <div style="font-size: 14px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">€86m</div>
-                        <div style="width: 100%; background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%); height: 21px; border-radius: 8px 8px 0 0;"></div>
-                        <div style="margin-top: 8px; font-size: 12px; font-weight: 600;">FR</div>
-                    </div>
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-                        <div style="font-size: 14px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">€79m</div>
-                        <div style="width: 100%; background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%); height: 20px; border-radius: 8px 8px 0 0;"></div>
-                        <div style="margin-top: 8px; font-size: 12px; font-weight: 600;">SG</div>
-                    </div>
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-                        <div style="font-size: 14px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">€76m</div>
-                        <div style="width: 100%; background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%); height: 19px; border-radius: 8px 8px 0 0;"></div>
-                        <div style="margin-top: 8px; font-size: 12px; font-weight: 600;">DE</div>
-                    </div>
-                    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
-                        <div style="font-size: 14px; font-weight: 700; color: var(--cva-primary); margin-bottom: 8px;">€66m</div>
-                        <div style="width: 100%; background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%); height: 16px; border-radius: 8px 8px 0 0;"></div>
-                        <div style="margin-top: 8px; font-size: 12px; font-weight: 600;">ES</div>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background: #f8f9fa; border-radius: 12px; padding: 25px; margin: 30px 0;">
-                <h3 style="color: var(--cva-primary); margin-bottom: 16px;">Assumptions & checks</h3>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="margin-bottom: 12px; padding-left: 24px; position: relative;">
-                        <span style="position: absolute; left: 0; color: var(--cva-secondary); font-weight: bold;">•</span>
-                        Stand-by ratio 1.5 × IT reflects blended Tier III (N+1) & Tier IV (2N) fleets.
-                    </li>
-                    <li style="margin-bottom: 12px; padding-left: 24px; position: relative;">
-                        <span style="position: absolute; left: 0; color: var(--cva-secondary); font-weight: bold;">•</span>
-                        Service factor = preventive MRO €5–10 /kW-yr [4], plus typical test-fuel 150 kWh / kW-yr × €0.30 = €45 /kW-yr [5]; rounded per market labour/carbon cost.
-                    </li>
-                    <li style="margin-bottom: 12px; padding-left: 24px; position: relative;">
-                        <span style="position: absolute; left: 0; color: var(--cva-secondary); font-weight: bold;">•</span>
-                        QC gate: spend = capacity × unit cost; all totals &lt; 1.5 × IT MW × €60.
-                    </li>
-                </ul>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 30px 0;">
-                <div style="background: white; border-radius: 12px; padding: 28px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); border-left: 4px solid var(--cva-primary);">
-                    <div style="font-size: 42px; font-weight: 800; color: var(--cva-primary); margin-bottom: 8px;">72%</div>
-                    <div style="font-size: 15px; color: var(--cva-gray); font-weight: 500;">Market concentration</div>
-                    <div style="font-size: 13px; color: #888; margin-top: 8px;">US + UK + DE share of total spend</div>
-                </div>
-                <div style="background: white; border-radius: 12px; padding: 28px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); border-left: 4px solid var(--cva-secondary);">
-                    <div style="font-size: 42px; font-weight: 800; color: var(--cva-primary); margin-bottom: 8px;">€50/kW-yr</div>
-                    <div style="font-size: 15px; color: var(--cva-gray); font-weight: 500;">Average service cost</div>
-                    <div style="font-size: 13px; color: #888; margin-top: 8px;">Weighted by diesel dominance</div>
-                </div>
-                <div style="background: white; border-radius: 12px; padding: 28px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); border-left: 4px solid var(--diesel);">
-                    <div style="font-size: 42px; font-weight: 800; color: var(--cva-primary); margin-bottom: 8px;">93%</div>
-                    <div style="font-size: 15px; color: var(--cva-gray); font-weight: 500;">Diesel share</div>
-                    <div style="font-size: 13px; color: #888; margin-top: 8px;">Of total stand-by MW</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Slide 15: Service-Pool Sensitivity -->
-    <section class="section" id="slide15">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-number">15</span>
-                <h2 class="section-title">Service-Pool Sensitivity: Policy & Technology Shifts (2025-2030)</h2>
-                <p class="section-subtitle">Strategic message – emissions limits and ancillary-service market design move €250-300 m of annual spend from fuel logistics toward digital MRO and grid-market enablement by 2030.</p>
-            </div>
-
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Driver (2025-30)</th>
-                        <th>Direction of change</th>
-                        <th>Quantified impact (illustrative)</th>
-                        <th>Supporting policy / data point</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>EU & UK MCPD NOₓ 190 mg /Nm³ limit</strong></td>
-                        <td style="text-align: center; font-size: 24px; color: var(--warning);">↑</td>
-                        <td>Engine retrofit capex +10 % and MRO +15 %<br><span style="color: var(--warning); font-weight: bold;">+€70 m/yr</span> across EU fleets (150 GW diesel)</td>
-                        <td>UK Specified Generator regs &lt;50 h yr [10]</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Bio-fuel (HVO) adoption 30 % fleet</strong></td>
-                        <td style="text-align: center; font-size: 24px; color: var(--warning);">↑</td>
-                        <td>Fuel €/kWh +25 %<br><span style="color: var(--warning); font-weight: bold;">+€90 m/yr</span> fuel spend (if no tax rebate)</td>
-                        <td>Digital Realty HVO trials [12]</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Battery share rises from 2 %→15 % standby MW</strong></td>
-                        <td style="text-align: center; font-size: 24px; color: var(--success);">↓</td>
-                        <td>Diesel fuel spend <span style="color: var(--success); font-weight: bold;">–€160 m/yr</span>; battery MRO <span style="color: var(--warning); font-weight: bold;">+€20 m/yr</span><br>Net <span style="color: var(--success); font-weight: bold;">–€140 m</span></td>
-                        <td>Hyperscaler diesel-exit pledge 2030 [17]</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Capacity-market clearing +20 % (UK T-4 2028/29)</strong></td>
-                        <td style="text-align: center; font-size: 24px; color: var(--battery);">↑</td>
-                        <td>Grid-service revenue <span style="color: var(--battery); font-weight: bold;">+€55 m/yr</span> (mainly batteries)</td>
-                        <td>UK CM clears £60/kW-yr up from £35 2024/25 [13]</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Fast-FCAS / FFR prices dip 15 % (battery saturation)</strong></td>
-                        <td style="text-align: center; font-size: 24px; color: var(--warning);">↓</td>
-                        <td>Ancillary revenue <span style="color: var(--warning); font-weight: bold;">–€25 m/yr</span></td>
-                        <td>AEMO VF-FCAS price trend [10]</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="country-chart">
-                <h3 style="color: var(--cva-primary); margin-bottom: 20px;">Service Pool Evolution 2024 → 2030</h3>
-                <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 40px; align-items: center; margin: 30px 0;">
-                    <!-- 2024 State -->
-                    <div style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);">
-                        <h4 style="color: var(--cva-primary); margin-bottom: 20px; text-align: center;">2024 Baseline</h4>
-                        <div style="height: 300px; display: flex; flex-direction: column;">
-                            <div style="background: var(--diesel); color: white; flex: 65; display: flex; align-items: center; justify-content: center; border-radius: 8px 8px 0 0;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 20px; font-weight: 700;">Fuel Logistics</div>
-                                    <div style="font-size: 32px; font-weight: 800;">65%</div>
-                                    <div style="font-size: 14px;">€715m</div>
-                                </div>
-                            </div>
-                            <div style="background: var(--cva-secondary); color: white; flex: 25; display: flex; align-items: center; justify-content: center;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 16px; font-weight: 600;">Engineering</div>
-                                    <div style="font-size: 24px; font-weight: 700;">25%</div>
-                                </div>
-                            </div>
-                            <div style="background: #4A90E2; color: white; flex: 10; display: flex; align-items: center; justify-content: center; border-radius: 0 0 8px 8px;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 14px; font-weight: 600;">MRO</div>
-                                    <div style="font-size: 20px; font-weight: 700;">10%</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="text-align: center; margin-top: 20px; font-size: 24px; font-weight: 700; color: var(--cva-primary);">€1,100m Total</div>
-                    </div>
-
-                    <!-- Arrow -->
-                    <div style="display: flex; flex-direction: column; align-items: center;">
-                        <div style="font-size: 48px; color: var(--cva-secondary);">→</div>
-                        <div style="background: linear-gradient(135deg, var(--cva-primary) 0%, var(--cva-secondary) 100%); color: white; padding: 12px 24px; border-radius: 50px; font-weight: 600; margin-top: 10px;">€250-300m shift</div>
-                    </div>
-
-                    <!-- 2030 State -->
-                    <div style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);">
-                        <h4 style="color: var(--cva-primary); margin-bottom: 20px; text-align: center;">2030 Projection</h4>
-                        <div style="height: 300px; display: flex; flex-direction: column;">
-                            <div style="background: var(--diesel); color: white; flex: 45; display: flex; align-items: center; justify-content: center; border-radius: 8px 8px 0 0;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 20px; font-weight: 700;">Fuel Logistics</div>
-                                    <div style="font-size: 32px; font-weight: 800;">45%</div>
-                                    <div style="font-size: 14px;">€585m</div>
-                                </div>
-                            </div>
-                            <div style="background: var(--cva-secondary); color: white; flex: 25; display: flex; align-items: center; justify-content: center;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 16px; font-weight: 600;">Engineering</div>
-                                    <div style="font-size: 24px; font-weight: 700;">25%</div>
-                                </div>
-                            </div>
-                            <div style="background: #4A90E2; color: white; flex: 18; display: flex; align-items: center; justify-content: center;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 14px; font-weight: 600;">Digital MRO</div>
-                                    <div style="font-size: 20px; font-weight: 700;">18%</div>
-                                </div>
-                            </div>
-                            <div style="background: var(--battery); color: white; flex: 12; display: flex; align-items: center; justify-content: center; border-radius: 0 0 8px 8px;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 14px; font-weight: 600;">Grid Services</div>
-                                    <div style="font-size: 20px; font-weight: 700;">12%</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="text-align: center; margin-top: 20px; font-size: 24px; font-weight: 700; color: var(--cva-primary);">€1,300m Total</div>
-                    </div>
-                </div>
-            </div>
-
-            <div style="background: #f8f9fa; border-radius: 12px; padding: 25px; margin: 30px 0;">
-                <h3 style="color: var(--cva-primary); margin-bottom: 16px;">Implications</h3>
-                <ul style="list-style: none; padding: 0;">
-                    <li style="margin-bottom: 12px; padding-left: 24px; position: relative;">
-                        <span style="position: absolute; left: 0; color: var(--cva-secondary); font-weight: bold;">•</span>
-                        <strong>Shift in spend mix:</strong> by 2030, preventive MRO + digital monitoring rises from 10 → 18 % of pool; fuel logistics falls from 65 → 45 %.
-                    </li>
-                    <li style="margin-bottom: 12px; padding-left: 24px; position: relative;">
-                        <span style="position: absolute; left: 0; color: var(--cva-secondary); font-weight: bold;">•</span>
-                        <strong>Contract evolution:</strong> asset-as-a-service (pay-per-availability) models gain traction, bundling maintenance + capacity-market dispatch.
-                    </li>
-                    <li style="margin-bottom: 12px; padding-left: 24px; position: relative;">
-                        <span style="position: absolute; left: 0; color: var(--cva-secondary); font-weight: bold;">•</span>
-                        <strong>Competitive edge:</strong> providers able to certify low-carbon backup (HVO, battery) plus manage grid-participation platforms will capture the reallocating €250-300 m spend.
-                    </li>
-                </ul>
-            </div>
-
-            <div class="footnote">
-                <strong>Figure notes & data integrity</strong><br>
-                All €/kW and €/kWh figures trace to dual-source evidence unless flagged; single-source items marked low confidence in Assumption Register (appendix).<br>
-                Currency: all converted to real-2024 € using ECB 2024 avg FX (1 € = 1.09 USD; 1 € = 0.86 £).
-            </div>
-        </div>
-    </section>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KidoPilot OS | Executive Demo</title>
+    
+    <!-- React Stack -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Update active nav link on scroll
-        window.addEventListener('scroll', () => {
-            let current = '';
-            const sections = document.querySelectorAll('section');
-            
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (pageYOffset >= sectionTop - 100) {
-                    current = section.getAttribute('id');
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            navy: '#0B2438',
+                            teal: '#0D9488',
+                            tealLight: '#F0FDFA',
+                            accent: '#F97316',
+                            surface: '#F8FAFC',
+                            border: '#E2E8F0'
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.4s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
                 }
-            });
-
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').slice(1) === current) {
-                    link.classList.add('active');
-                }
-            });
-        });
-
-        // Add scroll effect to navbar
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 100) {
-                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
-            } else {
-                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.08)';
             }
-        });
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased overflow-hidden selection:bg-brand-teal selection:text-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- INLINE ICONS (ZERO DEPENDENCY) ---
+        // SVGs intégrés pour garantir l'affichage à 100% sans script externe
+        const Icons = {
+            Menu: <path d="M4 6h16M4 12h16M4 18h16" />,
+            LayoutGrid: <rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" />,
+            CalendarClock: <path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h5" /><path d="M17.5 17.5 16 16.25V14" /><circle cx="16" cy="16" r="6" />,
+            Users: <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />,
+            FileCheck: <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /><path d="m9 15 2 2 4-4" />,
+            Coins: <circle cx="8" cy="8" r="6" /><path d="M18.09 10.37A6 6 0 1 1 10.34 18" /><path d="M7 6h1v4" /><path d="m16.71 13.88.7 .71-2.82 2.82" />,
+            Bell: <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />,
+            Search: <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />,
+            AlertTriangle: <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" />,
+            BrainCircuit: <path d="M12 4.5a2.5 2.5 0 0 0-4.96-.46 2.5 2.5 0 0 0-1.98 3 2.5 2.5 0 0 0-1.32 4.24 3 3 0 0 0 .34 5.58 2.5 2.5 0 0 0 2.96 3.08 2.5 2.5 0 0 0 4.91.05L12 20V4.5Z" /><path d="M16 8V5c0-1.1.9-2 2-2" /><path d="M12 13h4" /><path d="M12 18h6a2 2 0 0 1 2 2v1" /><path d="M12 8h8" />,
+            CheckCircle2: <circle cx="12" cy="12" r="10" /><path d="m9 12 2 2 4-4" />,
+            Clock: <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />,
+            TrendingUp: <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" />,
+            DollarSign: <line x1="12" x2="12" y1="2" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />,
+            ArrowRight: <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />,
+            ChevronDown: <path d="m6 9 6 6 6-6" />,
+            Sparkles: <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z" />
+        };
+
+        const Icon = ({ name, className = "", size = 20 }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width={size} 
+                height={size} 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className={className}
+            >
+                {Icons[name] || <circle cx="12" cy="12" r="10" />}
+            </svg>
+        );
+
+        // --- COMPONENTS ---
+
+        const Toast = ({ message, type, onClose }) => {
+            useEffect(() => {
+                const timer = setTimeout(onClose, 3000);
+                return () => clearTimeout(timer);
+            }, []);
+
+            const bgClass = type === 'success' ? 'bg-brand-navy text-white' : 'bg-white text-slate-800 border border-slate-200';
+            
+            return (
+                <div className={`fixed bottom-6 right-6 z-[60] px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4 animate-slide-up ${bgClass}`}>
+                    <Icon name={type === 'success' ? "CheckCircle2" : "Sparkles"} className={type === 'success' ? "text-brand-teal" : "text-brand-accent"} />
+                    <span className="font-medium">{message}</span>
+                </div>
+            );
+        };
+
+        const SidebarItem = ({ icon, label, active, onClick, alert }) => (
+            <button 
+                onClick={onClick}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${active ? 'bg-brand-teal/10 text-brand-teal font-bold' : 'text-slate-500 hover:bg-slate-100'}`}
+            >
+                <Icon name={icon} className={active ? 'text-brand-teal' : 'text-slate-400 group-hover:text-slate-600'} size={20} />
+                <span className="flex-1 text-left text-sm">{label}</span>
+                {alert && <span className="w-2 h-2 rounded-full bg-brand-accent animate-pulse-slow"></span>}
+            </button>
+        );
+
+        const KPI = ({ title, value, unit, trend, icon, color }) => (
+            <div className="bg-white p-4 lg:p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-4">
+                    <div className={`p-2 rounded-lg ${color}`}>
+                        <Icon name={icon} size={20} />
+                    </div>
+                    {trend && (
+                        <span className="text-[10px] lg:text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full flex items-center">
+                            <Icon name="TrendingUp" size={12} className="mr-1" /> {trend}
+                        </span>
+                    )}
+                </div>
+                <p className="text-slate-500 text-[10px] lg:text-xs font-bold uppercase tracking-wider">{title}</p>
+                <p className="text-xl lg:text-2xl font-display font-bold text-brand-navy mt-1">{value}<span className="text-sm text-slate-400 font-normal ml-1">{unit}</span></p>
+            </div>
+        );
+
+        // --- VIEWS ---
+
+        const DashboardView = ({ stats, alerts, onFixAlert }) => (
+            <div className="space-y-6 animate-slide-up pb-20 lg:pb-0">
+                {/* Header Context */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                    <div>
+                        <h2 className="text-2xl font-display font-bold text-brand-navy">Vue d'ensemble</h2>
+                        <p className="text-slate-500 text-sm">Mardi 2 Décembre • Crèche "Les Petits Pas"</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <button className="bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 hidden sm:block">Exporter</button>
+                    </div>
+                </div>
+
+                {/* Alerts Section (The Hook) */}
+                {alerts.length > 0 && (
+                    <div className="bg-orange-50/50 border border-orange-100 rounded-2xl p-4 lg:p-6 relative overflow-hidden">
+                        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between relative z-10">
+                            <div className="flex gap-4">
+                                <div className="bg-white p-3 rounded-xl shadow-sm text-brand-accent">
+                                    <Icon name="AlertTriangle" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-brand-navy text-lg">Attention requise (IA)</h3>
+                                    <p className="text-slate-600 text-sm max-w-md mt-1">
+                                        Sous-effectif critique détecté pour cet après-midi (14h-16h) suite à l'absence déclarée de Julie D.
+                                    </p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={onFixAlert}
+                                className="w-full md:w-auto bg-brand-accent text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all active:scale-95 flex items-center justify-center gap-2"
+                            >
+                                <Icon name="BrainCircuit" size={18} />
+                                Optimiser le Planning
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* KPIs Grid */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+                    <KPI title="Taux d'occupation" value={stats.occupancy} unit="%" trend="+2.4%" icon="Users" color="bg-blue-50 text-blue-600" />
+                    <KPI title="Ratio Encadrement" value={`1:${stats.ratio}`} unit="E/P" icon="Users" color={stats.ratio > 6 ? "bg-red-50 text-red-600" : "bg-teal-50 text-brand-teal"} />
+                    <KPI title="Masse Salariale" value={(stats.payroll / 1000).toFixed(1)} unit="k€" trend="-1.2%" icon="DollarSign" color="bg-purple-50 text-purple-600" />
+                    <KPI title="Conformité" value={stats.compliance} unit="/100" icon="FileCheck" color="bg-green-50 text-green-600" />
+                </div>
+
+                {/* Simple Chart Visualization */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="font-bold text-brand-navy">Évolution des Présences</h3>
+                        <div className="flex gap-2">
+                             <div className="flex items-center gap-1 text-xs text-slate-500"><div className="w-2 h-2 rounded-full bg-brand-teal"></div> Réel</div>
+                             <div className="flex items-center gap-1 text-xs text-slate-500"><div className="w-2 h-2 rounded-full bg-slate-200"></div> Prévu</div>
+                        </div>
+                    </div>
+                    <div className="h-48 flex items-end justify-between gap-2 px-2">
+                         {[65, 75, 94, 88, 70, 85, 90].map((h, i) => (
+                            <div key={i} className="w-full flex flex-col gap-2 group cursor-pointer h-full justify-end">
+                                <div className="w-full bg-slate-100 rounded-t-lg relative overflow-hidden" style={{height: '100%'}}>
+                                    <div style={{height: `${h}%`}} className="absolute bottom-0 w-full bg-brand-teal group-hover:bg-brand-navy transition-all duration-500 rounded-t-lg"></div>
+                                </div>
+                                <span className="text-center text-[10px] text-slate-400 font-medium">J{i+1}</span>
+                            </div>
+                         ))}
+                    </div>
+                </div>
+            </div>
+        );
+
+        const PlanningView = ({ staff, alerts, onFixAlert }) => (
+            <div className="space-y-4 lg:space-y-6 animate-slide-up h-full flex flex-col pb-20 lg:pb-0">
+                <div className="flex justify-between items-center">
+                    <h2 className="text-xl lg:text-2xl font-display font-bold text-brand-navy">Planning Intelligent</h2>
+                    <div className="flex gap-2">
+                         <button className="bg-white border border-slate-200 px-3 py-2 rounded-lg text-sm font-bold text-brand-navy">
+                            Aujourd'hui
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex-1 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col overflow-hidden relative">
+                    {/* Time Header */}
+                    <div className="hidden md:flex h-12 border-b border-slate-100 items-center pl-48 pr-4">
+                        {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map(h => (
+                            <div key={h} className="flex-1 text-xs text-slate-400 font-medium border-l border-slate-100 pl-2">
+                                {h}:00
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Timeline Body */}
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                        {staff.map(person => (
+                            <div key={person.id} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-0 group">
+                                <div className="w-full md:w-48 pr-4 flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-brand-navy text-white flex items-center justify-center text-xs font-bold">
+                                        {person.avatar}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-brand-navy text-sm">{person.name}</p>
+                                        <p className="text-xs text-slate-500">{person.role}</p>
+                                    </div>
+                                </div>
+                                <div className="w-full md:flex-1 h-10 md:h-12 bg-slate-50 rounded-xl relative border border-slate-100 overflow-hidden">
+                                    {/* The Shift Block */}
+                                    {person.status === 'present' && (
+                                        <div 
+                                            className="absolute top-1 bottom-1 bg-brand-teal/20 border border-brand-teal text-brand-teal text-[10px] md:text-xs font-bold rounded-lg flex items-center justify-center whitespace-nowrap px-2"
+                                            style={{ left: '0%', width: '100%' }} // Simplified for demo
+                                        >
+                                            <Icon name="Clock" size={12} className="mr-1 hidden md:block" />
+                                            {person.shift}
+                                        </div>
+                                    )}
+                                    
+                                    {/* The Problem Block */}
+                                    {person.status === 'absent' && (
+                                        <div 
+                                            className="absolute top-1 bottom-1 bg-red-50 border border-red-200 text-red-500 text-xs font-bold rounded-lg flex items-center justify-center w-full"
+                                        >
+                                            <Icon name="AlertTriangle" size={14} className="mr-2" />
+                                            Absence Non Remplacée
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* AI Action Panel (Bottom) */}
+                {alerts.length > 0 && (
+                    <div className="bg-brand-navy text-white p-4 rounded-xl flex flex-col md:flex-row justify-between items-center shadow-lg gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center animate-pulse-slow">
+                                <Icon name="BrainCircuit" className="text-brand-accent" />
+                            </div>
+                            <div>
+                                <p className="font-bold text-sm">Solution trouvée par l'IA</p>
+                                <p className="text-xs text-slate-300">Remplacement par C. Dupont (Vacataire) disponible.</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={onFixAlert}
+                            className="w-full md:w-auto bg-brand-teal hover:bg-teal-600 text-white px-6 py-2 rounded-lg font-bold text-sm transition-colors"
+                        >
+                            Valider (+85€)
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
+
+        // --- MAIN APP SHELL ---
+
+        const App = () => {
+            const [view, setView] = useState('dashboard');
+            const [alerts, setAlerts] = useState(['understaffed']);
+            const [stats, setStats] = useState({ occupancy: 94, ratio: 6.2, payroll: 32450, compliance: 92 });
+            const [staff, setStaff] = useState([
+                { id: 1, name: 'Marie L.', role: 'EJE', shift: '08:00 - 16:00', status: 'present', avatar: 'M' },
+                { id: 2, name: 'Sarah B.', role: 'AP', shift: '08:30 - 17:00', status: 'present', avatar: 'S' },
+                { id: 3, name: 'Julie D.', role: 'CAP', shift: '09:00 - 18:00', status: 'absent', avatar: 'J' },
+                { id: 4, name: 'Thomas P.', role: 'AP', shift: '10:00 - 18:30', status: 'present', avatar: 'T' },
+            ]);
+            const [showToast, setShowToast] = useState(null);
+            const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+            const handleFixAlert = () => {
+                setShowToast({ message: "Analyse des profils...", type: "info" });
+                
+                setTimeout(() => {
+                    setAlerts([]);
+                    
+                    const newStaff = staff.map(p => 
+                        p.id === 3 ? { ...p, name: 'Clara D. (Interim)', status: 'present', shift: '14:00 - 18:00', avatar: 'C' } : p
+                    );
+                    setStaff(newStaff);
+
+                    setStats(prev => ({
+                        ...prev,
+                        ratio: 5.8,
+                        payroll: prev.payroll + 85
+                    }));
+
+                    setShowToast({ message: "Planning optimisé !", type: "success" });
+                }, 1000);
+            };
+
+            return (
+                <div className="flex h-screen w-full bg-slate-50">
+                    {/* Sidebar Mobile Overlay */}
+                    {isSidebarOpen && (
+                        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)}></div>
+                    )}
+
+                    {/* Sidebar */}
+                    <aside className={`fixed lg:static inset-y-0 left-0 w-64 bg-white border-r border-slate-200 z-50 transform transition-transform duration-300 lg:transform-none ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} flex flex-col`}>
+                        <div className="p-6 flex items-center gap-3">
+                            <div className="w-8 h-8 bg-brand-navy rounded-lg flex items-center justify-center text-white font-display font-bold text-lg shadow-md">K</div>
+                            <span className="font-display font-bold text-xl tracking-tight text-brand-navy">KidoPilot</span>
+                        </div>
+
+                        <div className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                            <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Pilotage</p>
+                            <SidebarItem icon="LayoutGrid" label="Tableau de bord" active={view === 'dashboard'} onClick={() => { setView('dashboard'); setSidebarOpen(false); }} alert={alerts.length > 0} />
+                            <SidebarItem icon="CalendarClock" label="Planning" active={view === 'planning'} onClick={() => { setView('planning'); setSidebarOpen(false); }} />
+                            <SidebarItem icon="Users" label="Enfants & Staff" />
+                            
+                            <div className="h-6"></div>
+                            <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Conformité</p>
+                            <SidebarItem icon="FileCheck" label="Audit PMI" />
+                            <SidebarItem icon="Coins" label="CAF & PSU" />
+                        </div>
+
+                        <div className="p-4 border-t border-slate-100">
+                            <div className="flex items-center gap-3 px-4 py-2">
+                                <div className="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs font-bold">CD</div>
+                                <div className="flex-1">
+                                    <p className="text-sm font-bold text-brand-navy">Claire D.</p>
+                                    <p className="text-xs text-slate-500">Directrice</p>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* Main Content */}
+                    <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
+                        {/* Mobile Header */}
+                        <div className="lg:hidden h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 z-30">
+                            <button onClick={() => setSidebarOpen(true)} className="p-2 text-slate-600">
+                                <Icon name="Menu" />
+                            </button>
+                            <span className="font-bold text-brand-navy">KidoPilot</span>
+                            <div className="w-8"></div>
+                        </div>
+
+                        {/* Desktop Header */}
+                        <header className="hidden lg:flex h-16 glass-panel items-center justify-between px-8 z-30">
+                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                                <span className="font-bold text-brand-navy">Paris 17 - Batignolles</span>
+                                <Icon name="ChevronDown" size={14} />
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <button className="p-2 relative text-slate-400 hover:text-brand-navy transition">
+                                    <Icon name="Bell" size={20} />
+                                    {alerts.length > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-accent rounded-full border border-white"></span>}
+                                </button>
+                            </div>
+                        </header>
+
+                        {/* Content Area */}
+                        <div className="flex-1 overflow-auto p-4 lg:p-8 relative">
+                            {view === 'dashboard' && <DashboardView stats={stats} alerts={alerts} onFixAlert={() => setView('planning')} />}
+                            {view === 'planning' && <PlanningView staff={staff} alerts={alerts} onFixAlert={handleFixAlert} />}
+                        </div>
+                    </main>
+
+                    {/* Toast */}
+                    {showToast && (
+                        <Toast 
+                            message={showToast.message} 
+                            type={showToast.type} 
+                            onClose={() => setShowToast(null)} 
+                        />
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
+
